@@ -80,6 +80,7 @@ h2{font-size:18px;margin:0 0 8px}
     <div class="mu" id="lvd"></div></div>
   <div class="card"><h2>Minutes</h2>
     <div class="row"><label class="mu">Focus<input id="sf" type="number" min="1"></label><label class="mu">Break<input id="ss" type="number" min="1"></label><label class="mu">Long break<input id="sl" type="number" min="1"></label></div></div>
+  <div class="card"><h2>Sync</h2><div class="mu" id="sync">Loading…</div><div class="row"><button class="p" id="sbtn" disabled>Sign in with Google</button></div></div>
 </section>
 </main>
 <nav><button data-v="timer" class="on">Timer</button><button data-v="tasks">Tasks</button><button data-v="stats">Stats</button><button data-v="set">Settings</button></nav>
@@ -88,7 +89,10 @@ h2{font-size:18px;margin:0 0 8px}
 const $=s=>document.querySelector(s),K='focusflow.v1',day=d=>(d||new Date()).toLocaleDateString('en-CA');
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let S=Object.assign({set:{f:25,s:5,l:15,lv:'firm'},tasks:[],log:[],park:[],streak:0,last:null,cycle:0,timer:null,cur:null},JSON.parse(localStorage.getItem(K)||'null')||{});
-const save=()=>localStorage.setItem(K,JSON.stringify(S));
+const pick=o=>({set:o.set,tasks:o.tasks,log:o.log,park:o.park,streak:o.streak,last:o.last,cycle:o.cycle,timer:o.timer,cur:o.cur});
+let lastJ=JSON.stringify(pick(S));
+const save=()=>{const j=JSON.stringify(pick(S));if(j!==lastJ){lastJ=j;S.u=Date.now();window.cloudPush&&cloudPush()}localStorage.setItem(K,JSON.stringify(S))};
+window.FF={get:()=>({p:pick(S),u:S.u||0}),apply:r=>{Object.assign(S,pick(r),{u:r.u});lastJ=JSON.stringify(pick(S));localStorage.setItem(K,JSON.stringify(S));render()}};
 const LVD={gentle:'Skip breaks and quit any time.',firm:'Quitting needs a reason. Breaks can\'t be skipped.',strict:'Firm rules, and quitting a focus session resets your streak.'};
 
 function ask(msg,btns,inp){$('#dm').textContent=msg;const i=$('#di');i.classList.toggle('hide',!inp);i.value='';const b=$('#db');b.innerHTML='';
@@ -160,4 +164,21 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.query
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
 render();tick();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-</script></body></html>
+</script><script type="module">
+const B='https://www.gstatic.com/firebasejs/10.14.1/firebase-',st=$('#sync'),btn=$('#sbtn');
+try{
+const [{initializeApp},{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signOut},{getFirestore,doc,setDoc,onSnapshot}]=await Promise.all(['app','auth','firestore'].map(m=>import(B+m+'.js')));
+const app=initializeApp({apiKey:"AIzaSyCF7BOT-3BDhtuwVH2P26_zK6iBxZJ616A",authDomain:"focusflow-b862e.firebaseapp.com",projectId:"focusflow-b862e",storageBucket:"focusflow-b862e.firebasestorage.app",messagingSenderId:"491770279014",appId:"1:491770279014:web:b83f2a2ee42a70b3a1a9a7"});
+const auth=getAuth(app),db=getFirestore(app);let un=null,ref=null,t=0;
+window.cloudPush=()=>{if(!ref)return;clearTimeout(t);t=setTimeout(()=>{const s=FF.get();setDoc(ref,{j:JSON.stringify(s.p),u:s.u}).catch(e=>st.textContent='Sync error: '+e.code)},600)};
+btn.disabled=false;
+onAuthStateChanged(auth,u=>{un&&un();un=null;ref=null;
+ if(!u){st.textContent='Not signed in. Data stays on this device.';btn.textContent='Sign in with Google';return}
+ st.textContent='Syncing as '+u.email;btn.textContent='Sign out';ref=doc(db,'users',u.uid);
+ un=onSnapshot(ref,s=>{const d=s.data(),l=FF.get();
+  if(!d){cloudPush();return}
+  if(d.u>l.u)FF.apply({...JSON.parse(d.j),u:d.u});else if(d.u<l.u)cloudPush()},e=>st.textContent='Sync error: '+e.code)});
+btn.onclick=()=>auth.currentUser?signOut(auth):signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>st.textContent='Sign-in failed: '+e.code);
+}catch(e){st.textContent='Sync unavailable (offline?). The app still works locally.'}
+</script>
+</body></html>
