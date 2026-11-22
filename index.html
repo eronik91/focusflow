@@ -40,6 +40,9 @@ dialog::backdrop{background:#0007}
 h2{font-size:18px;margin:0 0 8px}
 .hide{display:none!important}
 @media(prefers-reduced-motion:reduce){.tank i{transition:none}}
+dialog label{display:block;margin-top:8px}
+#print{display:none}
+@media print{body{background:#fff!important;color:#000!important;padding:0!important;font:11pt/1.4 system-ui,"Segoe UI",sans-serif}main,nav,dialog{display:none!important}#print{display:block}#print h1{font-size:22pt;margin:0 0 8px}#print table{width:100%;border-collapse:collapse}#print th,#print td{border-bottom:1px solid #aaa;padding:5px 6px;text-align:left;vertical-align:top}#print .r{text-align:right}#print .s td{font-weight:600;background:#f0f0f0}#print .tt{font-weight:600;font-size:13pt;margin:10px 0 0}}
 </style></head><body>
 <main>
 <section id="v-timer" class="on">
@@ -69,6 +72,15 @@ h2{font-size:18px;margin:0 0 8px}
     <div id="tlist"></div>
   </div>
 </section>
+<section id="v-time">
+  <div class="card tank"><div class="mu" id="tstate">Not clocked in</div><div class="big" id="tclock" style="font-size:64px">0:00:00</div></div>
+  <div class="card">
+    <input id="tcl" list="cls" placeholder="Client (optional)" aria-label="Client"><datalist id="cls"></datalist>
+    <input id="ttask" placeholder="What are you working on?" style="margin-top:8px" aria-label="Task">
+    <div class="row"><button class="p" id="tio">Clock in</button></div>
+  </div>
+  <div class="card"><div class="row"><button id="tadd2">+ Add entry</button><button class="p" id="trep">PDF report</button></div><div id="tents"></div></div>
+</section>
 <section id="v-stats">
   <div class="card stats"><div><b id="s1">0</b><span class="mu">min today</span></div><div><b id="s2">0</b><span class="mu">day streak</span></div><div><b id="s3">0</b><span class="mu">sessions</span></div></div>
   <div class="card"><h2>Last 7 days</h2><div class="bars" id="bars"></div><div style="height:18px"></div></div>
@@ -83,16 +95,31 @@ h2{font-size:18px;margin:0 0 8px}
   <div class="card"><h2>Sync</h2><div class="mu" id="sync">Loading…</div><div class="row"><button class="p" id="sbtn" disabled>Sign in with Google</button></div></div>
 </section>
 </main>
-<nav><button data-v="timer" class="on">Timer</button><button data-v="tasks">Tasks</button><button data-v="stats">Stats</button><button data-v="set">Settings</button></nav>
+<nav><button data-v="timer" class="on">Timer</button><button data-v="tasks">Tasks</button><button data-v="time">Hours</button><button data-v="stats">Stats</button><button data-v="set">Settings</button></nav>
+<dialog id="edlg"><h2 id="edt">Entry</h2>
+ <label class="mu">Date<input type="date" id="ed-d"></label>
+ <div class="row"><label class="mu">In<input type="time" id="ed-i"></label><label class="mu">Out<input type="time" id="ed-o"></label></div>
+ <label class="mu">Client<input id="ed-c" list="cls"></label>
+ <label class="mu">Task<input id="ed-t"></label>
+ <div class="row"><button id="ed-x">Cancel</button><button id="ed-del">Delete</button><button class="p" id="ed-s">Save</button></div></dialog>
+<dialog id="rdlg"><h2>PDF report</h2>
+ <div class="row"><label class="mu">From<input type="date" id="r-f"></label><label class="mu">To<input type="date" id="r-t"></label></div>
+ <label class="mu">Client<select id="r-c"></select></label>
+ <label class="mu">Your name<input id="r-n"></label>
+ <div class="row"><label class="mu">Rate / hour (optional)<input id="r-r" type="number" min="0" step="any" inputmode="decimal"></label><label class="mu">Currency (optional)<input id="r-u" placeholder="USD"></label></div>
+ <div class="row"><button id="r-x">Cancel</button><button class="p" id="r-g">Create PDF</button></div></dialog>
+<div id="print"></div>
 <dialog id="dlg"><h2 id="dm"></h2><input id="di" class="hide"><div class="row" id="db"></div></dialog>
 <script>
 const $=s=>document.querySelector(s),K='focusflow.v1',day=d=>(d||new Date()).toLocaleDateString('en-CA');
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let S=Object.assign({set:{f:25,s:5,l:15,lv:'firm'},tasks:[],log:[],park:[],streak:0,last:null,cycle:0,timer:null,cur:null},JSON.parse(localStorage.getItem(K)||'null')||{});
-const pick=o=>({set:o.set,tasks:o.tasks,log:o.log,park:o.park,streak:o.streak,last:o.last,cycle:o.cycle,timer:o.timer,cur:o.cur});
+let S=Object.assign({set:{f:25,s:5,l:15,lv:'firm'},tasks:[],log:[],park:[],streak:0,last:null,cycle:0,timer:null,cur:null,ts:[],clk:null,inv:{}},JSON.parse(localStorage.getItem(K)||'null')||{});
+const pick=o=>({set:o.set,tasks:o.tasks,log:o.log,park:o.park,streak:o.streak,last:o.last,cycle:o.cycle,timer:o.timer,cur:o.cur,ts:o.ts||[],clk:o.clk||null,inv:o.inv||{}});
 let lastJ=JSON.stringify(pick(S));
 const save=()=>{const j=JSON.stringify(pick(S));if(j!==lastJ){lastJ=j;S.u=Date.now();window.cloudPush&&cloudPush()}localStorage.setItem(K,JSON.stringify(S))};
-window.FF={get:()=>({p:pick(S),u:S.u||0}),apply:r=>{Object.assign(S,pick(r),{u:r.u});lastJ=JSON.stringify(pick(S));localStorage.setItem(K,JSON.stringify(S));render()}};
+window.FF={get:()=>({p:pick(S),u:S.u||0}),
+ apply:r=>{const m=mergeTs(S.ts,r.ts||[]),rm=new Map((r.ts||[]).map(e=>[e.id,e.u])),ch=m.some(e=>rm.get(e.id)!==e.u);Object.assign(S,pick(r),{ts:m,u:r.u});lastJ=JSON.stringify(pick(S));localStorage.setItem(K,JSON.stringify(S));render();if(ch){lastJ='';save()}},
+ merge:rts=>{const m=mergeTs(S.ts,rts||[]);if(JSON.stringify(m)!==JSON.stringify(S.ts)){S.ts=m;lastJ='';save();render()}else window.cloudPush&&cloudPush()}};
 const LVD={gentle:'Skip breaks and quit any time.',firm:'Quitting needs a reason. Breaks can\'t be skipped.',strict:'Firm rules, and quitting a focus session resets your streak.'};
 
 function ask(msg,btns,inp){$('#dm').textContent=msg;const i=$('#di');i.classList.toggle('hide',!inp);i.value='';const b=$('#db');b.innerHTML='';
@@ -123,7 +150,7 @@ function stop(){const t=S.timer;if(!t)return;
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 function paint(){const t=S.timer;if(!t)return;const left=Math.max(0,Math.ceil((t.end-Date.now())/1000));
  $('#time').textContent=fmt(left);$('#fill').style.height=(100-left/t.total*100)+'%';document.title=fmt(left)+' FocusFlow'}
-function tick(){if(!S.timer)return;S.timer.end<=Date.now()?finish():paint()}
+function tick(){if(S.clk)$('#tclock').textContent=hms(Date.now()-S.clk.in);if(!S.timer)return;S.timer.end<=Date.now()?finish():paint()}
 
 function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#idle').classList.toggle('hide',!!t);
@@ -145,7 +172,7 @@ function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#quits').innerHTML=q.length?q.map(l=>`${l.d}: ${esc(l.why||'no reason given')}`).join('<br>'):'None yet.';
  document.querySelectorAll('#lv button').forEach(b=>b.classList.toggle('on',b.dataset.l===S.set.lv));
  $('#lvd').textContent=LVD[S.set.lv];$('#sf').value=S.set.f;$('#ss').value=S.set.s;$('#sl').value=S.set.l;
- $('#parkc').classList.toggle('hide',!(t&&t.mode==='focus'));save()}
+ $('#parkc').classList.toggle('hide',!(t&&t.mode==='focus'));renderTs();save()}
 
 $('#go').onclick=()=>start('focus',S.set.f);
 $('#mini').onclick=()=>start('focus',5,1);
@@ -161,6 +188,42 @@ $('#tlist').onchange=e=>{const k=S.tasks.find(x=>x.id===e.target.dataset.d);if(k
 $('#lv').onclick=e=>{if(e.target.dataset.l){S.set.lv=e.target.dataset.l;render()}};
 [['sf','f'],['ss','s'],['sl','l']].forEach(([id,k])=>$('#'+id).onchange=e=>{S.set[k]=Math.max(1,+e.target.value||S.set[k]);render()});
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button,section').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#v-'+b.dataset.v).classList.add('on')});
+const mergeTs=(a,b)=>{const m=new Map();[...a,...b].forEach(e=>{const o=m.get(e.id);if(!o||(e.u||0)>(o.u||0))m.set(e.id,e)});return[...m.values()]};
+const live=()=>S.ts.filter(e=>!e.del),mn=ms=>Math.floor(ms/6e4)*6e4,dstr=ms=>day(new Date(ms)),tm=ms=>new Date(ms).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),hhmm=ms=>new Date(ms).toTimeString().slice(0,5),dec=ms=>(ms/36e5).toFixed(2);
+const hms=ms=>{const s=Math.floor(ms/1e3);return Math.floor(s/3600)+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const hm=ms=>{const m=Math.round(ms/6e4);return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')};
+function renderTs(){const c=S.clk;
+ if(c){$('#tcl').value=c.c||'';$('#ttask').value=c.task||''}
+ $('#tcl').disabled=$('#ttask').disabled=!!c;
+ $('#tio').textContent=c?'Clock out':'Clock in';$('#tstate').textContent=c?'Clocked in at '+tm(c.in):'Not clocked in';
+ if(!c)$('#tclock').textContent='0:00:00';
+ const E=live().sort((a,b)=>b.in-a.in).slice(0,150),g={};E.forEach(e=>(g[dstr(e.in)]=g[dstr(e.in)]||[]).push(e));
+ $('#tents').innerHTML=Object.entries(g).map(([d,a])=>`<h2 style="margin-top:14px">${d} <span class="mu">${hm(a.reduce((s,e)=>s+e.out-e.in,0))}</span></h2>`+a.map(e=>`<div class="item" data-e="${e.id}" style="cursor:pointer"><span>${tm(e.in)}–${tm(e.out)}<br><small class="mu">${esc((e.c?e.c+' · ':'')+(e.task||'No task'))}</small></span><b>${hm(e.out-e.in)}</b></div>`).join('')).join('')||'<div class="mu">No entries yet.</div>';
+ $('#cls').innerHTML=[...new Set(live().map(e=>e.c).filter(Boolean))].map(x=>`<option value="${esc(x)}">`).join('')}
+$('#tio').onclick=()=>{const c=S.clk;if(c){S.ts.push({id:Date.now()+'',in:c.in,out:mn(Date.now()),task:c.task,c:c.c,u:Date.now()});S.clk=null}else S.clk={in:mn(Date.now()),task:$('#ttask').value.trim(),c:$('#tcl').value.trim()};render()};
+let EID=null;
+function edit(id){EID=id;const e=S.ts.find(x=>x.id===id)||{in:new Date().setHours(9,0,0,0),out:new Date().setHours(17,0,0,0),task:'',c:''};
+ $('#edt').textContent=id?'Edit entry':'Add entry';$('#ed-d').value=dstr(e.in);$('#ed-i').value=hhmm(e.in);$('#ed-o').value=hhmm(e.out);$('#ed-c').value=e.c||'';$('#ed-t').value=e.task||'';$('#ed-del').classList.toggle('hide',!id);$('#edlg').showModal()}
+$('#tents').onclick=e=>{const r=e.target.closest('[data-e]');if(r)edit(r.dataset.e)};
+$('#tadd2').onclick=()=>edit(null);
+$('#ed-x').onclick=()=>$('#edlg').close();
+$('#ed-del').onclick=()=>{const e=S.ts.find(x=>x.id===EID);if(e){e.del=1;e.u=Date.now()}$('#edlg').close();render()};
+$('#ed-s').onclick=()=>{const d=$('#ed-d').value,i=new Date(d+'T'+$('#ed-i').value).getTime();let o=new Date(d+'T'+$('#ed-o').value).getTime();if(!(i>0&&o>0))return;if(o<=i)o+=864e5;
+ const v={in:i,out:o,task:$('#ed-t').value.trim(),c:$('#ed-c').value.trim(),u:Date.now()},e=S.ts.find(x=>x.id===EID);e?Object.assign(e,v):S.ts.push({id:Date.now()+'',...v});$('#edlg').close();render()};
+$('#trep').onclick=()=>{const n=new Date(),v=S.inv||{};$('#r-f').value=day(new Date(n.getFullYear(),n.getMonth(),1));$('#r-t').value=day(n);
+ $('#r-c').innerHTML='<option value="">All clients</option>'+[...new Set(live().map(e=>e.c).filter(Boolean))].map(x=>`<option${x===v.client?' selected':''}>${esc(x)}</option>`).join('');
+ $('#r-n').value=v.name||'';$('#r-r').value=v.rate||'';$('#r-u').value=v.cur||'';$('#rdlg').showModal()};
+$('#r-x').onclick=()=>$('#rdlg').close();
+$('#r-g').onclick=()=>{const f=$('#r-f').value,t=$('#r-t').value,c=$('#r-c').value,nm=$('#r-n').value.trim(),rt=parseFloat($('#r-r').value)||0,cu=$('#r-u').value.trim();
+ S.inv={name:nm,client:c,rate:rt||'',cur:cu};
+ const E=live().filter(e=>dstr(e.in)>=f&&dstr(e.in)<=t&&(!c||e.c===c)).sort((a,b)=>a.in-b.in);
+ $('#rdlg').close();if(!E.length){ask('No entries in that range.',[['OK',()=>{},1]]);return}
+ const g={};E.forEach(e=>(g[dstr(e.in)]=g[dstr(e.in)]||[]).push(e));const tot=E.reduce((s,e)=>s+e.out-e.in,0);
+ let h=`<h1>Timesheet</h1><p>${nm?'<b>'+esc(nm)+'</b><br>':''}${c?'Client: '+esc(c)+'<br>':''}Period: ${f} to ${t}</p><table><thead><tr><th>Date</th><th>In</th><th>Out</th><th>Task</th><th class="r">Hours</th></tr></thead><tbody>`;
+ Object.entries(g).forEach(([d,a])=>{a.forEach((e,k)=>{h+=`<tr><td>${k?'':d}</td><td>${tm(e.in)}</td><td>${tm(e.out)}</td><td dir="auto">${esc((c||!e.c?'':e.c+': ')+(e.task||''))}</td><td class="r">${hm(e.out-e.in)}</td></tr>`});h+=`<tr class="s"><td colspan="4" class="r">Total ${d}</td><td class="r">${hm(a.reduce((s,e)=>s+e.out-e.in,0))}</td></tr>`});
+ h+=`</tbody></table><p class="tt">Total hours: ${hm(tot)} (${dec(tot)} h)</p>`;
+ if(rt)h+=`<p class="tt">Rate: ${esc(cu)} ${rt.toFixed(2)} / hour<br>Amount due: ${esc(cu)} ${(tot/36e5*rt).toFixed(2)}</p>`;
+ $('#print').innerHTML=h;save();setTimeout(()=>window.print(),100)};
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
 render();tick();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -177,7 +240,7 @@ onAuthStateChanged(auth,u=>{un&&un();un=null;ref=null;
  st.textContent='Syncing as '+u.email;btn.textContent='Sign out';ref=doc(db,'users',u.uid);
  un=onSnapshot(ref,s=>{const d=s.data(),l=FF.get();
   if(!d){cloudPush();return}
-  if(d.u>l.u)FF.apply({...JSON.parse(d.j),u:d.u});else if(d.u<l.u)cloudPush()},e=>st.textContent='Sync error: '+e.code)});
+  const r=JSON.parse(d.j);if(d.u>l.u)FF.apply({...r,u:d.u});else if(d.u<l.u)FF.merge(r.ts)},e=>st.textContent='Sync error: '+e.code)});
 btn.onclick=()=>auth.currentUser?signOut(auth):signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>st.textContent='Sign-in failed: '+e.code);
 }catch(e){st.textContent='Sync unavailable (offline?). The app still works locally.'}
 </script>
