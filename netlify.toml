@@ -1,0 +1,6 @@
+# The site is a static app at the repository root (no build step).
+# Setting base here overrides the project's "Base directory" UI setting.
+[build]
+  base = "/"
+  publish = "."
+  command = ""
