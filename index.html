@@ -21,6 +21,15 @@ input,select{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px s
 .tank{position:relative;overflow:hidden;text-align:center;padding:28px 12px}
 .tank i{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--ac);opacity:.18;transition:height .5s linear}
 .tank>*{position:relative}
+.ringw{position:relative;width:min(78vw,300px);aspect-ratio:1;margin:0 auto}
+.ringw svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.rt{fill:none;stroke:var(--line);stroke-width:10}
+.rp{fill:none;stroke:var(--ac);stroke-width:10;stroke-linecap:round;stroke-dasharray:603.2;transition:stroke-dashoffset .5s linear,stroke .3s}
+.rin{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rin .big{font-size:clamp(48px,17vw,68px);margin:4px 0}
+.hi{font:400 26px Georgia,serif;margin:4px 2px 14px}.hi small{display:block;font:14px system-ui,sans-serif;color:var(--mu);margin-top:2px}
+.card{box-shadow:0 1px 3px rgba(20,32,43,.06)}button:active{transform:scale(.97)}
+.sw{width:40px;height:40px;border-radius:50%;padding:0;border:3px solid var(--card);outline:1px solid var(--line)}.row .sw{flex:0 0 40px}.sw.on{outline:3px solid var(--tx)}
 .big{font:400 84px/1 "Iowan Old Style",Georgia,serif;font-variant-numeric:tabular-nums;margin:10px 0}
 .mu{color:var(--mu);font-size:14px}
 .row{display:flex;gap:8px;margin:8px 0}.row>*{flex:1}
@@ -41,7 +50,7 @@ dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);co
 dialog::backdrop{background:#0007}
 h2{font-size:18px;margin:0 0 8px}
 .hide{display:none!important}
-@media(prefers-reduced-motion:reduce){.tank i{transition:none}}
+@media(prefers-reduced-motion:reduce){.rp{transition:none}button:active{transform:none}}
 @media(min-width:900px){
 body{padding:0 0 0 224px}
 main{max-width:1040px;padding:32px 36px}
@@ -49,9 +58,9 @@ nav{top:0;right:auto;width:224px;flex-direction:column;gap:4px;border-top:0;bord
 .brand{display:block;font:400 24px Georgia,serif;padding:4px 12px 22px}
 nav button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;font-size:15px;padding:12px 14px;border-radius:10px;width:100%}
 nav button.on{background:var(--bg)}
-.big{font-size:112px}#tclock{font-size:84px!important}
+.big{font-size:112px}.rin .big{font-size:72px}#tclock{font-size:84px!important}
 #v-timer.on,#v-time.on,#v-stats.on,#v-set.on{display:grid;gap:0 18px;align-items:start}
-#v-timer.on{grid-template-columns:1.3fr 1fr}#v-timer .card:nth-child(3){grid-column:2;grid-row:1/span 2}#parkc.hide{display:block!important}
+#v-timer.on{grid-template-columns:1.3fr 1fr}#v-timer .hi{grid-column:1/-1}#v-timer #parkc{grid-column:2;grid-row:2/span 2}#parkc.hide{display:block!important}
 #v-time.on{grid-template-columns:360px 1fr}#v-time>.card:nth-child(3){grid-column:2;grid-row:1/span 2}
 #v-stats.on,#v-set.on{grid-template-columns:1fr 1fr}#v-stats>.card:first-child{grid-column:1/-1}
 #v-tasks.on{max-width:720px}
@@ -62,10 +71,9 @@ dialog label{display:block;margin-top:8px}
 </style></head><body>
 <main>
 <section id="v-timer" class="on">
-  <div class="card tank"><i id="fill"></i>
-    <div class="mu" id="lbl">Ready</div>
-    <div class="big" id="time">25:00</div>
-    <div class="mu" id="cur"></div>
+  <div class="hi" id="hi"></div>
+  <div class="card tank"><div class="ringw"><svg viewBox="0 0 220 220" aria-hidden="true"><circle class="rt" cx="110" cy="110" r="96"/><circle id="ring" class="rp" cx="110" cy="110" r="96"/></svg>
+    <div class="rin"><div class="mu" id="lbl">Ready</div><div class="big" id="time">25:00</div><div class="mu" id="cur"></div></div></div>
   </div>
   <div class="card">
     <select id="task" aria-label="Current task"></select>
@@ -84,6 +92,7 @@ dialog label{display:block;margin-top:8px}
 </section>
 <section id="v-tasks">
   <div class="card"><h2>Tasks</h2>
+    <input id="tcin" list="cls" placeholder="Client (optional)" aria-label="Client" style="margin-bottom:8px">
     <div class="row"><input id="tin" placeholder="Add a task"><button class="p" id="tadd" style="flex:0">Add</button></div>
     <div id="tlist"></div>
   </div>
@@ -92,7 +101,7 @@ dialog label{display:block;margin-top:8px}
   <div class="card tank"><div class="mu" id="tstate">Not clocked in</div><div class="big" id="tclock" style="font-size:64px">0:00:00</div></div>
   <div class="card">
     <input id="tcl" list="cls" placeholder="Client (optional)" aria-label="Client"><datalist id="cls"></datalist>
-    <input id="ttask" placeholder="What are you working on?" style="margin-top:8px" aria-label="Task">
+    <input id="ttask" list="tl" placeholder="What are you working on?" style="margin-top:8px" aria-label="Task"><datalist id="tl"></datalist>
     <div class="row"><button class="p" id="tio">Clock in</button></div>
   </div>
   <div class="card"><div class="row"><button id="tadd2">+ Add entry</button><button class="p" id="trep">PDF report</button></div><div id="tents"></div></div>
@@ -108,6 +117,7 @@ dialog label{display:block;margin-top:8px}
     <div class="mu" id="lvd"></div></div>
   <div class="card"><h2>Minutes</h2>
     <div class="row"><label class="mu">Focus<input id="sf" type="number" min="1"></label><label class="mu">Break<input id="ss" type="number" min="1"></label><label class="mu">Long break<input id="sl" type="number" min="1"></label></div></div>
+  <div class="card"><h2>Accent color</h2><div class="row" id="acs"><button class="sw" data-ac="" style="background:#2f5bea" aria-label="Accent 1"></button><button class="sw" data-ac="#7c5cf0" style="background:#7c5cf0" aria-label="Accent 2"></button><button class="sw" data-ac="#e8604c" style="background:#e8604c" aria-label="Accent 3"></button><button class="sw" data-ac="#d98a00" style="background:#d98a00" aria-label="Accent 4"></button><button class="sw" data-ac="#d6457a" style="background:#d6457a" aria-label="Accent 5"></button></div></div>
   <div class="card"><h2>Sync</h2><div class="mu" id="sync">Loading…</div><div class="row"><button class="p" id="sbtn" disabled>Sign in with Google</button></div></div>
 </section>
 </main>
@@ -146,12 +156,12 @@ function beep(){try{const a=new AudioContext();[0,.25,.5].forEach(t=>{const o=a.
 function notify(t,b){if(!('Notification'in window)||Notification.permission!=='granted')return;
  navigator.serviceWorker?.ready.then(r=>r.showNotification(t,{body:b,icon:'icon-192.png',tag:'ff',renotify:true,vibrate:[200,100,200,100,400],requireInteraction:true,silent:false})).catch(()=>new Notification(t,{body:b}))}
 
-function start(mode,min,mini){if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
+function start(mode,min,mini){if(mode==='focus'&&!S.clk){const k=S.tasks.find(x=>x.id===S.cur);S.clk={in:mn(Date.now()),task:k?k.t:'',c:k&&k.c||''}}if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
  S.timer={mode,end:Date.now()+min*6e4,total:min*60,task:S.cur,mini:!!mini};save();render()}
 function brk(){const L=S.cycle%4===0;start(L?'long':'short',L?S.set.l:S.set.s)}
 function done(t){S.log.push({d:day(),m:Math.round(t.total/60),task:t.task,ok:1});const td=day(),y=day(new Date(Date.now()-864e5));
  if(S.last!==td){S.streak=S.last===y?S.streak+1:1;S.last=td}}
-function finish(){const t=S.timer;S.timer=null;beep();
+function finish(){const t=S.timer;S.timer=null;beep();navigator.vibrate&&navigator.vibrate([120,60,120]);
  if(t.mode==='focus'){done(t);if(!t.mini)S.cycle++;notify('Session complete','Nice work.');save();render();
   if(t.mini)ask('5 minutes done. Keep going?',[['Stop here',()=>{}],['Full session',()=>start('focus',S.set.f),1]]);
   else ask('Last 10%: is this task finished?',[['Needs another round',brk],['Task done',()=>{const k=S.tasks.find(x=>x.id===t.task);if(k)k.done=1;save();render();brk()},1]]);
@@ -161,24 +171,24 @@ function stop(){const t=S.timer;if(!t)return;
  const lv=S.set.lv;
  ask('Quit this session? What got in the way?',[['Keep going',()=>{}],['Quit',why=>{
   S.log.push({d:day(),m:Math.round((t.total-(t.end-Date.now())/1000)/60),task:t.task,ok:0,why});
-  if(lv==='strict'){S.streak=0;S.last=null}S.timer=null;save();render()},1]],lv==='gentle'?1:2)}
+  if(lv==='strict'){S.streak=0;S.last=null}S.timer=null;save();render();if(S.clk)setTimeout(()=>ask('Session ended. Keep the clock running?',[['Keep running',()=>{}],['Clock out',clockOut,1]]),50)},1]],lv==='gentle'?1:2)}
 
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 function paint(){const t=S.timer;if(!t)return;const left=Math.max(0,Math.ceil((t.end-Date.now())/1000));
- $('#time').textContent=fmt(left);$('#fill').style.height=(100-left/t.total*100)+'%';document.title=fmt(left)+' FocusFlow'}
-function tick(){if(S.clk)$('#tclock').textContent=hms(Date.now()-S.clk.in);if(!S.timer)return;S.timer.end<=Date.now()?finish():paint()}
+ $('#time').textContent=fmt(left);$('#ring').style.strokeDashoffset=603.2*(1-left/t.total);document.title=fmt(left)+' FocusFlow'}
+function tick(){if(S.clk){$('#tclock').textContent=hms(Date.now()-S.clk.in);if(Date.now()-(S.clk.w||S.clk.in)>144e5&&!$('#dlg').open){S.clk.w=Date.now();save();ask('Your clock has been running for hours. Still working?',[['Clock out',clockOut],['Still working',()=>{},1]])}}if(!S.timer)return;S.timer.end<=Date.now()?finish():paint()}
 
 function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#idle').classList.toggle('hide',!!t);
  $('#run').classList.toggle('hide',!t||(m!=='focus'&&S.set.lv!=='gentle'));
  $('#stop').textContent=m==='focus'?'Quit':'Skip break';
  $('#lbl').textContent=t?(m==='focus'?(t.mini?'Just 5 minutes':'Focus'):m==='short'?'Break':'Long break'):'Ready';
- if(t)paint();else{$('#time').textContent=fmt(S.set.f*60);$('#fill').style.height=0;document.title='FocusFlow'}
+ if(t)paint();else{$('#time').textContent=fmt(S.set.f*60);$('#ring').style.strokeDashoffset=0;document.title='FocusFlow'}
  const open=S.tasks.filter(x=>!x.done);if(!open.find(x=>x.id===S.cur))S.cur=open[0]?.id||null;
  $('#task').innerHTML='<option value="">No task</option>'+open.map(x=>`<option value="${x.id}"${x.id===S.cur?' selected':''}>${esc(x.t)}</option>`).join('');
  $('#task').value=S.cur||'';
  $('#plist').innerHTML=S.park.map((p,i)=>`<div class="item"><span>${esc(p)}</span><button data-p="${i}" aria-label="Remove">✕</button></div>`).join('');
- $('#tlist').innerHTML=S.tasks.map(x=>`<div class="item${x.done?' d':''}"><input type="checkbox" data-d="${x.id}"${x.done?' checked':''} aria-label="Done"><span>${esc(x.t)}</span><small class="mu">${S.log.filter(l=>l.task===x.id&&l.ok).length} sessions</small><button data-x="${x.id}" aria-label="Delete">✕</button></div>`).join('')||'<div class="mu">No tasks yet. Add the one you keep avoiding.</div>';
+ $('#tlist').innerHTML=S.tasks.map(x=>`<div class="item${x.done?' d':''}"><input type="checkbox" data-d="${x.id}"${x.done?' checked':''} aria-label="Done"><span>${esc(x.t)}${x.c?'<br><small class="mu">'+esc(x.c)+'</small>':''}</span><small class="mu">${S.log.filter(l=>l.task===x.id&&l.ok).length} sessions</small><button data-x="${x.id}" aria-label="Delete">✕</button></div>`).join('')||'<div class="mu">No tasks yet. Add the one you keep avoiding.</div>';
  const td=day(),ok=S.log.filter(l=>l.ok);
  $('#s1').textContent=ok.filter(l=>l.d===td).reduce((a,l)=>a+l.m,0);$('#s2').textContent=S.streak;$('#s3').textContent=ok.length;
  let w=[];for(let i=6;i>=0;i--){const d=new Date(Date.now()-i*864e5);w.push([d.toLocaleDateString('en',{weekday:'short'}),ok.filter(l=>l.d===day(d)).reduce((a,l)=>a+l.m,0)])}
@@ -188,7 +198,7 @@ function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#quits').innerHTML=q.length?q.map(l=>`${l.d}: ${esc(l.why||'no reason given')}`).join('<br>'):'None yet.';
  document.querySelectorAll('#lv button').forEach(b=>b.classList.toggle('on',b.dataset.l===S.set.lv));
  $('#lvd').textContent=LVD[S.set.lv];$('#sf').value=S.set.f;$('#ss').value=S.set.s;$('#sl').value=S.set.l;
- $('#parkc').classList.toggle('hide',!(t&&t.mode==='focus'));renderTs();save()}
+ $('#parkc').classList.toggle('hide',!(t&&t.mode==='focus'));renderTs();renderHi();save()}
 
 $('#go').onclick=()=>start('focus',S.set.f);
 $('#mini').onclick=()=>start('focus',5,1);
@@ -196,7 +206,7 @@ $('#stop').onclick=stop;
 $('#task').onchange=e=>{S.cur=e.target.value||null;save()};
 const addP=()=>{const v=$('#pin').value.trim();if(v){S.park.push(v);$('#pin').value='';render()}};
 $('#padd').onclick=addP;$('#pin').onkeydown=e=>e.key==='Enter'&&addP();
-const addT=()=>{const v=$('#tin').value.trim();if(v){S.tasks.push({id:Date.now()+'',t:v,done:0});$('#tin').value='';render()}};
+const addT=()=>{const v=$('#tin').value.trim();if(v){S.tasks.push({id:Date.now()+'',t:v,c:$('#tcin').value.trim(),done:0});$('#tin').value='';render()}};
 $('#tadd').onclick=addT;$('#tin').onkeydown=e=>e.key==='Enter'&&addT();
 $('#plist').onclick=e=>{const i=e.target.dataset.p;if(i!=null){S.park.splice(i,1);render()}};
 $('#tlist').onclick=e=>{const d=e.target.dataset;if(d.x){S.tasks=S.tasks.filter(x=>x.id!==d.x);render()}};
@@ -214,9 +224,17 @@ function renderTs(){const c=S.clk;
  $('#tio').textContent=c?'Clock out':'Clock in';$('#tstate').textContent=c?'Clocked in at '+tm(c.in):'Not clocked in';
  if(!c)$('#tclock').textContent='0:00:00';
  const E=live().sort((a,b)=>b.in-a.in).slice(0,150),g={};E.forEach(e=>(g[dstr(e.in)]=g[dstr(e.in)]||[]).push(e));
- $('#tents').innerHTML=Object.entries(g).map(([d,a])=>`<h2 style="margin-top:14px">${d} <span class="mu">${hm(a.reduce((s,e)=>s+e.out-e.in,0))}</span></h2>`+a.map(e=>`<div class="item" data-e="${e.id}" style="cursor:pointer"><span>${tm(e.in)}–${tm(e.out)}<br><small class="mu">${esc((e.c?e.c+' · ':'')+(e.task||'No task'))}</small></span><b>${hm(e.out-e.in)}</b></div>`).join('')).join('')||'<div class="mu">No entries yet.</div>';
- $('#cls').innerHTML=[...new Set(live().map(e=>e.c).filter(Boolean))].map(x=>`<option value="${esc(x)}">`).join('')}
-$('#tio').onclick=()=>{const c=S.clk;if(c){S.ts.push({id:Date.now()+'',in:c.in,out:mn(Date.now()),task:c.task,c:c.c,u:Date.now()});S.clk=null}else S.clk={in:mn(Date.now()),task:$('#ttask').value.trim(),c:$('#tcl').value.trim()};render()};
+ $('#tents').innerHTML=Object.entries(g).map(([d,a])=>`<h2 style="margin-top:14px">${d} <span class="mu">${hm(a.reduce((s,e)=>s+e.out-e.in,0))}</span></h2>`+a.map(e=>`<div class="item" data-e="${e.id}" style="cursor:pointer"><span>${tm(e.in)}–${tm(e.out)}<br><small class="mu">${esc((e.c?e.c+' · ':'')+(e.task||'No task'))}</small></span><b>${hm(e.out-e.in)}</b></div>`).join('')).join('')||'<div class="mu">No entries yet. Clock in to log your first one.</div>';
+ $('#tl').innerHTML=S.tasks.filter(x=>!x.done).map(x=>`<option value="${esc(x.t)}">`).join('');
+ $('#cls').innerHTML=[...new Set([...live().map(e=>e.c),...S.tasks.map(x=>x.c)].filter(Boolean))].map(x=>`<option value="${esc(x)}">`).join('')}
+function clockOut(){const c=S.clk;if(!c)return;S.ts.push({id:Date.now()+'',in:c.in,out:mn(Date.now()),task:c.task,c:c.c,u:Date.now()});S.clk=null;render()}
+$('#tio').onclick=()=>{if(S.clk)return clockOut();S.clk={in:mn(Date.now()),task:$('#ttask').value.trim(),c:$('#tcl').value.trim()};render()};
+$('#ttask').oninput=e=>{const k=S.tasks.find(x=>!x.done&&x.t===e.target.value);if(k&&k.c&&!$('#tcl').value)$('#tcl').value=k.c};
+$('#acs').onclick=e=>{const a=e.target.dataset.ac;if(a!=null){S.set.ac=a;render()}};
+function renderHi(){const h=new Date().getHours(),td=day(),m=S.log.filter(l=>l.ok&&l.d===td).reduce((a,l)=>a+l.m,0),t=S.timer,k=t&&S.tasks.find(x=>x.id===t.task);
+ $('#hi').innerHTML=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+`<small>${m?m+' min focused today':'Nothing focused yet today. Start small.'}${S.streak?' · '+S.streak+'-day streak':''}</small>`;
+ $('#cur').textContent=k?k.t:'';document.documentElement.style.setProperty('--ac',S.set.ac||'');
+ document.querySelectorAll('#acs button').forEach(b=>b.classList.toggle('on',b.dataset.ac===(S.set.ac||'')))}
 let EID=null;
 function edit(id){EID=id;const e=S.ts.find(x=>x.id===id)||{in:new Date().setHours(9,0,0,0),out:new Date().setHours(17,0,0,0),task:'',c:''};
  $('#edt').textContent=id?'Edit entry':'Add entry';$('#ed-d').value=dstr(e.in);$('#ed-i').value=hhmm(e.in);$('#ed-o').value=hhmm(e.out);$('#ed-c').value=e.c||'';$('#ed-t').value=e.task||'';$('#ed-del').classList.toggle('hide',!id);$('#edlg').showModal()}
