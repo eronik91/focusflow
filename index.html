@@ -41,11 +41,13 @@ input,select{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px s
 #v-set .card>label{display:block;margin-top:10px}
 #fm{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
 #fm .big{font-size:clamp(72px,24vw,160px)}#fm .row{width:min(420px,100%)}
-.rpt{font:13px/1.45 system-ui,"Segoe UI",sans-serif;color:#000;background:#fff}.rpt .rh{display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid #2f5bea;padding-bottom:8px}.rpt h1{font-size:26px;margin:0}.rpt h3{font-size:14px;margin:18px 0 4px}.rpt .rn{font-weight:600}
-.rpt .meta{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin:14px 0}.rpt .k{color:#666;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
-.rpt table{width:100%;border-collapse:collapse}.rpt th,.rpt td{border-bottom:1px solid #bbb;padding:6px 8px;text-align:left;vertical-align:top}.rpt th{background:#eef1f6;font-size:11px;text-transform:uppercase}.rpt .r{text-align:right}.rpt .s td{font-weight:600;background:#f6f7f9}
-.rpt .tot{display:flex;gap:30px;margin-top:18px;padding:12px;border:2px solid #2f5bea;border-radius:6px;font-size:14px}.rpt .tot b{font-size:20px}
-.rpt .sig{display:flex;gap:40px;margin-top:50px}.rpt .sig div{flex:1;border-top:1px solid #000;padding-top:4px;font-size:11px;color:#555}
+.rpt{font:11px/1.4 Arial,Helvetica,"Segoe UI",sans-serif;color:#000;background:#fff;padding:4px 2px}
+.rpt h1{font-size:22px;font-weight:400;margin:0 0 6px}.rpt .sub{color:#555;font-size:12px;margin:2px 0}
+.rpt .tot{font-size:12px;color:#555;margin:14px 0 26px}.rpt .tot b{font-size:15px;color:#000;font-weight:500}
+.rpt table{width:100%;border-collapse:collapse;table-layout:fixed}
+.rpt th{text-align:left;font-weight:400;color:#555;font-size:11px;padding:0 6px 8px 0;border-bottom:1px solid #bbb}
+.rpt td{padding:9px 6px 9px 0;border-bottom:1px solid #ddd;vertical-align:top}
+.rpt .b{font-weight:700;font-size:10.5px}.rpt .g{color:#666;font-size:10px;margin-top:3px}.rpt sup{font-size:7px;margin-left:1px}
 .sw{width:40px;height:40px;border-radius:50%;padding:0;border:3px solid var(--card);outline:1px solid var(--line)}.row .sw{flex:0 0 40px}.sw.on{outline:3px solid var(--tx)}
 .big{font:400 84px/1 "Iowan Old Style",Georgia,serif;font-variant-numeric:tabular-nums;margin:10px 0}
 .mu{color:var(--mu);font-size:14px}
@@ -85,7 +87,7 @@ nav button.on{background:var(--bg)}
 }
 dialog label{display:block;margin-top:8px}
 #print{display:none}
-@media print{body{background:#fff!important;color:#000!important;padding:0!important;font:11pt/1.4 system-ui,"Segoe UI",sans-serif}main,nav,dialog,.gear{display:none!important}#print{display:block}#print h1{font-size:22pt;margin:0 0 8px}#print table{width:100%;border-collapse:collapse}#print th,#print td{border-bottom:1px solid #aaa;padding:5px 6px;text-align:left;vertical-align:top}#print .r{text-align:right}#print .s td{font-weight:600;background:#f0f0f0}#print .tt{font-weight:600;font-size:13pt;margin:10px 0 0}}
+@media print{body{background:#fff!important;color:#000!important;padding:0!important;font:11pt/1.4 system-ui,"Segoe UI",sans-serif}main,nav,dialog,.gear{display:none!important}#print{display:block}}
 </style></head><body>
 <button class="gear" id="gear" data-v="set" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button>
 <main>
@@ -160,10 +162,8 @@ dialog label{display:block;margin-top:8px}
  <label class="mu">Client<select id="r-c"></select></label>
  <label class="mu">Your name<input id="r-n"></label>
  <div class="row"><label class="mu">Rate / hour (optional)<input id="r-r" type="number" min="0" step="any" inputmode="decimal"></label><label class="mu">Currency (optional)<input id="r-u" placeholder="USD"></label></div>
- <label class="mu">Number (optional)<input id="r-no"></label>
- <label class="mu" style="display:flex;gap:8px;align-items:center"><input id="r-sg" type="checkbox" style="width:auto"> Add signature lines</label>
  <div class="row"><button id="r-x">Cancel</button><button id="r-s" class="hide">Share…</button><button class="p" id="r-g">Download PDF</button></div></dialog>
-<div id="print"></div>
+<div id="print" class="rpt"></div>
 <div id="fm" class="hide"><div class="mu" id="fml">Focus</div><div class="big" id="fmt">25:00</div><div class="mu" id="fmc"></div>
  <div class="row"><input id="fmp" placeholder="Park a thought"><button id="fmpa" style="flex:0">Park</button></div>
  <div class="row"><button id="fmx">Exit focus mode</button><button id="fmq">Quit</button></div></div>
@@ -278,18 +278,15 @@ $('#trep').onclick=()=>{const n=new Date(),v=S.inv||{};$('#r-f').value=day(new D
  $('#r-c').innerHTML='<option value="">All clients</option>'+[...new Set(live().map(e=>e.c).filter(Boolean))].map(x=>`<option${x===v.client?' selected':''}>${esc(x)}</option>`).join('');
  $('#r-n').value=v.name||'';$('#r-r').value=v.rate||'';$('#r-u').value=v.cur||'';$('#r-s').classList.toggle('hide',!(navigator.canShare&&navigator.share));$('#rdlg').showModal()};
 $('#r-x').onclick=()=>$('#rdlg').close();
-function gen(share){const f=$('#r-f').value,t=$('#r-t').value,c=$('#r-c').value,nm=$('#r-n').value.trim(),rt=parseFloat($('#r-r').value)||0,cu=$('#r-u').value.trim(),no=$('#r-no').value.trim(),sg=$('#r-sg').checked,fn='Timesheet_'+(c||'all').replace(/[^\w\u0600-\u06FF\uAC00-\uD7AF-]+/g,'_')+'_'+f+'_to_'+t+'.pdf';
+function gen(share){const f=$('#r-f').value,t=$('#r-t').value,c=$('#r-c').value,nm=$('#r-n').value.trim(),rt=parseFloat($('#r-r').value)||0,cu=$('#r-u').value.trim(),fn='Timesheet_'+(c||'all').replace(/[^\w\u0600-\u06FF\uAC00-\uD7AF-]+/g,'_')+'_'+f+'_to_'+t+'.pdf';
  S.inv={name:nm,client:c,rate:rt||'',cur:cu};
  const E=live().filter(e=>dstr(e.in)>=f&&dstr(e.in)<=t&&(!c||e.c===c)).sort((a,b)=>a.in-b.in);
  $('#rdlg').close();if(!E.length){ask('No entries in that range.',[['OK',()=>{},1]]);return}
  const g={};E.forEach(e=>(g[dstr(e.in)]=g[dstr(e.in)]||[]).push(e));const tot=E.reduce((s,e)=>s+e.out-e.in,0);
- const ds=new Date().toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}),mt=(a,b)=>b?`<div><span class="k">${a}</span><br><b dir="auto">${esc(b)}</b></div>`:'';
- let h=`<div class="rh"><h1>Timesheet</h1>${no?'<div class="rn">No. '+esc(no)+'</div>':''}</div><div class="meta">${mt('Prepared by',nm)}${mt('Client',c||'All clients')}${mt('Period',f+' to '+t)}${mt('Issued',ds)}</div><table><thead><tr><th>Date</th><th>In</th><th>Out</th><th>Task</th><th class="r">Hours</th></tr></thead><tbody>`;
- Object.entries(g).forEach(([d,a])=>{a.forEach((e,k)=>{h+=`<tr><td>${k?'':d}</td><td>${tm(e.in)}</td><td>${tm(e.out)}</td><td dir="auto">${esc((c||!e.c?'':e.c+': ')+(e.task||''))}</td><td class="r">${hm(e.out-e.in)}</td></tr>`});h+=`<tr class="s"><td colspan="4" class="r">Total ${d}</td><td class="r">${hm(a.reduce((s,e)=>s+e.out-e.in,0))}</td></tr>`});
- h+='</tbody></table>';const bt={};E.forEach(e=>{const k=e.task||'No task';bt[k]=(bt[k]||0)+e.out-e.in});
- h+=`<h3>Summary by task</h3><table><tbody>${Object.entries(bt).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td dir="auto">${esc(k)}</td><td class="r">${hm(v)}</td></tr>`).join('')}</tbody></table>`;
- h+=`<div class="tot"><div><span class="k">Total hours</span><br><b>${hm(tot)}</b> <span class="k">(${dec(tot)} h)</span></div>${rt?`<div><span class="k">Rate</span><br><b>${esc(cu)} ${rt.toFixed(2)}</b> / hour</div><div><span class="k">Amount due</span><br><b>${esc(cu)} ${(tot/36e5*rt).toFixed(2)}</b></div>`:''}</div>`;
- if(sg)h+='<div class="sig"><div>Signature</div><div>Approved by</div></div>';
+ const dm=ms=>{const d=new Date(ms);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()},t12=ms=>{const d=new Date(ms),x=d.getHours();return((x%12)||12)+':'+String(d.getMinutes()).padStart(2,'0')+(x<12?'AM':'PM')},fd=x=>x.split('-').reverse().join('/'),rtl=x=>/[\u0590-\u08FF]/.test(x)&&x.length<=40?x.replace(/ /g,'\u00a0'):x;
+ let h=`<h1>Detailed report</h1><div class="sub">${fd(f)} - ${fd(t)}</div>${c?'<div class="sub">Client: '+esc(c)+'</div>':''}<div class="tot">Total: <b>${hm(tot)}</b></div>${rt?'<div class="sub" style="margin:-16px 0 22px">Rate: '+esc(cu)+' '+rt.toFixed(2)+' / hour &nbsp;·&nbsp; Amount: <b style="color:#000">'+esc(cu)+' '+(tot/36e5*rt).toFixed(2)+'</b></div>':''}<table><colgroup><col style="width:14%"><col style="width:44%"><col style="width:26%"><col style="width:16%"></colgroup><thead><tr><th>Date</th><th>Description</th><th>Duration</th><th>User</th></tr></thead><tbody>`;
+ [...E].reverse().forEach(e=>{const nx=Math.round((new Date(e.out).setHours(0,0,0,0)-new Date(e.in).setHours(0,0,0,0))/864e5);h+=`<tr><td class="b">${dm(e.in)}</td><td><div class="b" dir="auto" style="text-align:left">${esc(rtl(e.task||'(Without Description)'))}</div><div class="g">${esc(rtl(e.c||''))}</div></td><td><div class="b">${hm(e.out-e.in)}</div><div class="g">${t12(e.in)} - ${t12(e.out)}${nx>0?'<sup>+'+nx+'</sup>':''}</div></td><td class="b">${esc(rtl(nm))}</td></tr>`});
+ h+='</tbody></table>';
  save();makePdf(h,fn,share)}
 $('#r-g').onclick=()=>gen(0);$('#r-s').onclick=()=>gen(1);
 let SHOWALL=false,FM=false,AC=null,AN=null,AT='';
