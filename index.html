@@ -1,19 +1,21 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#e9eef2">
+<meta name="theme-color" content="#0a0d13">
+<script>try{document.documentElement.dataset.t=JSON.parse(localStorage.getItem("focusflow.v1")).set.th||"dark"}catch(e){}</script>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png">
 <title>FocusFlow</title>
 <style>
-:root{--bg:#e9eef2;--card:#f8fafb;--line:#cfd8df;--tx:#14202b;--mu:#5d6b78;--ac:#2f5bea;--on:#fff}
-@media(prefers-color-scheme:dark){:root{--bg:#10171d;--card:#18222b;--line:#2a3743;--tx:#e8eef3;--mu:#8a9aa8;--ac:#6b8cff;--on:#0b1220}}
-body[data-m=short],body[data-m=long]{--ac:#1f9d74}
-@media(prefers-color-scheme:dark){body[data-m=short],body[data-m=long]{--ac:#43c79b}}
+:root{--bg:#0a0d13;--card:#121721;--line:#222a3a;--tx:#e7eaf2;--mu:#8a93a8;--ac:#818cf8;--acw:#22d3ee;--acb:#34d399;--on:#0a0d13;--hi:rgba(255,255,255,.035);color-scheme:dark}
+:root[data-t=light]{--bg:#eef1f6;--card:#fff;--line:#d8dee9;--tx:#141a26;--mu:#5d6779;--ac:#4f5bd5;--acw:#0891b2;--acb:#0f9d74;--on:#fff;--hi:transparent;color-scheme:light}
+@media(prefers-color-scheme:light){:root[data-t=system]{--bg:#eef1f6;--card:#fff;--line:#d8dee9;--tx:#141a26;--mu:#5d6779;--ac:#4f5bd5;--acw:#0891b2;--acb:#0f9d74;--on:#fff;--hi:transparent;color-scheme:light}}
+body[data-md=work]{--ac:var(--acw)}
+body[data-m=short],body[data-m=long]{--ac:var(--acb)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif;padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom))}
 main{max-width:520px;margin:auto;padding:16px}
 section{display:none}section.on{display:block}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.card{background:var(--card);background-image:linear-gradient(180deg,var(--hi),transparent 60%);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
 button{font:inherit;border:1px solid var(--line);border-radius:8px;padding:12px 16px;background:var(--card);color:var(--tx);cursor:pointer}
 button.p{background:var(--ac);border-color:var(--ac);color:var(--on);font-weight:600}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
@@ -23,12 +25,20 @@ input,select{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px s
 .tank>*{position:relative}
 .ringw{position:relative;width:min(78vw,300px);aspect-ratio:1;margin:0 auto}
 .ringw svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
-.rt{fill:none;stroke:var(--line);stroke-width:10}
-.rp{fill:none;stroke:var(--ac);stroke-width:10;stroke-linecap:round;stroke-dasharray:603.2;transition:stroke-dashoffset .5s linear,stroke .3s}
+.rt{fill:none;stroke:var(--line);stroke-width:6}
+.rp{fill:none;stroke:var(--ac);stroke-width:6;stroke-linecap:round;stroke-dasharray:603.2;filter:drop-shadow(0 0 7px var(--ac));transition:stroke-dashoffset .5s linear,stroke .3s}
 .rin{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .rin .big{font-size:clamp(48px,17vw,68px);margin:4px 0}
-.hi{font:400 26px Georgia,serif;margin:4px 2px 14px}.hi small{display:block;font:14px system-ui,sans-serif;color:var(--mu);margin-top:2px}
+.hi{font:600 22px ui-sans-serif,system-ui,sans-serif;letter-spacing:-.01em;margin:4px 2px 14px}.hi small{display:block;font:14px system-ui,sans-serif;color:var(--mu);margin-top:2px}
 .card{box-shadow:0 1px 3px rgba(20,32,43,.06)}button:active{transform:scale(.97)}
+.topbar{display:flex;align-items:center;gap:10px;padding-right:50px;margin-bottom:14px}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{border:0;background:none;border-radius:999px;padding:7px 16px;font-size:14px;color:var(--mu)}.seg button.on{background:var(--ac);color:var(--on);font-weight:600}
+.pill{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ac);border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--card);font-variant-numeric:tabular-nums;cursor:pointer}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+section.on{animation:sin .25s ease}@keyframes sin{from{opacity:0;transform:translateY(6px)}}
+button{transition:border-color .15s,filter .15s,transform .1s}button:hover{border-color:var(--ac)}button.p:hover{filter:brightness(1.1)}
 .cta{width:100%;padding:18px;font-size:18px}#go{width:100%;margin-top:8px}
 .item.cur{border-left:3px solid var(--ac);padding-left:8px}.item[data-t]{cursor:pointer}
 #db{flex-wrap:wrap}#db button{flex:1 1 40%}
@@ -49,32 +59,32 @@ input,select{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px s
 .rpt td{padding:9px 6px 9px 0;border-bottom:1px solid #ddd;vertical-align:top}
 .rpt .b{font-weight:700;font-size:10.5px}.rpt .g{color:#666;font-size:10px;margin-top:3px}.rpt sup{font-size:7px;margin-left:1px}
 .sw{width:40px;height:40px;border-radius:50%;padding:0;border:3px solid var(--card);outline:1px solid var(--line)}.row .sw{flex:0 0 40px}.sw.on{outline:3px solid var(--tx)}
-.big{font:400 84px/1 "Iowan Old Style",Georgia,serif;font-variant-numeric:tabular-nums;margin:10px 0}
+.big{font:300 84px/1 ui-sans-serif,system-ui,"SF Pro Display","Segoe UI",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.03em;margin:10px 0}
 .mu{color:var(--mu);font-size:14px}
 .row{display:flex;gap:8px;margin:8px 0}.row>*{flex:1}
 .item{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
 .item:first-child{border-top:0}.item span{flex:1}.item.d span{text-decoration:line-through;color:var(--mu)}
 .item input{width:auto}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
-.stats b{display:block;font:400 32px Georgia,serif}
+.stats b{display:block;font:300 32px ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums}
 .bars{display:flex;align-items:flex-end;gap:6px;height:100px;margin-top:10px}
 .bars div{flex:1;background:var(--ac);border-radius:4px 4px 0 0;min-height:2px;position:relative}
 .bars small{position:absolute;top:100%;left:0;right:0;text-align:center;color:var(--mu);font-size:11px;margin-top:2px}
-nav{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;background:color-mix(in srgb,var(--card) 82%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 .brand{display:none}
-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;border-radius:0;background:none;color:var(--mu);font-size:11px;padding:9px 2px}nav button.on{color:var(--ac);font-weight:600}
+nav button{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;border-radius:0;background:none;color:var(--mu);font-size:11px;padding:9px 2px}nav button.on{color:var(--ac);font-weight:600}nav button.on::before{content:"";position:absolute;top:0;left:30%;right:30%;height:2px;border-radius:2px;background:var(--ac)}
 nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .lv button.on{background:var(--ac);color:var(--on);border-color:var(--ac)}
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--tx);max-width:420px;width:90%}
 dialog::backdrop{background:#0007}
 h2{font-size:18px;margin:0 0 8px}
 .hide{display:none!important}
-@media(prefers-reduced-motion:reduce){.rp{transition:none}button:active{transform:none}}
+@media(prefers-reduced-motion:reduce){.rp{transition:none}button:active{transform:none}section.on,.pill::before{animation:none}}
 @media(min-width:900px){
 body{padding:0 0 0 224px}
 main{max-width:1040px;padding:32px 36px}
 nav{top:0;right:auto;width:224px;flex-direction:column;gap:4px;border-top:0;border-right:1px solid var(--line);padding:24px 12px}
-.brand{display:block;font:400 24px Georgia,serif;padding:4px 12px 22px}
+.brand{display:block;font:700 18px ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;padding:4px 12px 22px}.brand::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ac);margin-right:9px;box-shadow:0 0 10px var(--ac)}nav button.on::before{left:0;right:auto;top:22%;bottom:22%;width:3px;height:auto}
 nav button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;font-size:15px;padding:12px 14px;border-radius:10px;width:100%}
 nav button.on{background:var(--bg)}
 .big{font-size:112px}.rin .big{font-size:72px}#tclock{font-size:84px!important}
@@ -91,10 +101,12 @@ dialog label{display:block;margin-top:8px}
 </style></head><body>
 <button class="gear" id="gear" data-v="set" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button>
 <main>
+<div class="topbar"><div class="seg" id="seg"><button data-md="personal">Personal</button><button data-md="work">Work</button></div><div class="pill hide" id="cpill" role="button" tabindex="0"><span id="cpt">0:00:00</span></div></div>
 <section id="v-timer" class="on">
   <div class="hi" id="hi"></div>
   <div class="cols">
   <div class="colL">
+  <div class="card" id="wk"><div class="mu" id="wtxt">Not clocked in</div><div class="big" id="wclk" style="font-size:44px;margin:6px 0 12px">0:00:00</div><button class="p cta" id="wio">Clock in</button></div>
   <div class="card tank"><div class="ringw"><svg viewBox="0 0 220 220" aria-hidden="true"><circle class="rt" cx="110" cy="110" r="96"/><circle id="ring" class="rp" cx="110" cy="110" r="96"/></svg>
     <div class="rin"><div class="mu" id="lbl">Ready</div><div class="big" id="time">25:00</div><div class="mu" id="cur"></div></div></div>
   </div>
@@ -146,7 +158,7 @@ dialog label{display:block;margin-top:8px}
     <label class="mu">Completion sound<select id="ssn"><option value="chime">Chime</option><option value="bell">Bell</option><option value="soft">Soft</option><option value="off">Off</option></select></label>
     <label class="mu">Ambient sound while focusing<select id="sam"><option value="">Off</option><option value="brown">Brown noise</option><option value="white">White noise</option><option value="rain">Rain</option></select></label>
     <label class="mu" style="display:flex;gap:8px;align-items:center"><input id="sfa" type="checkbox" style="width:auto"> Open focus mode automatically</label></div>
-  <div class="card"><h2>Accent color</h2><div class="row" id="acs"><button class="sw" data-ac="" style="background:#2f5bea" aria-label="Accent 1"></button><button class="sw" data-ac="#7c5cf0" style="background:#7c5cf0" aria-label="Accent 2"></button><button class="sw" data-ac="#e8604c" style="background:#e8604c" aria-label="Accent 3"></button><button class="sw" data-ac="#d98a00" style="background:#d98a00" aria-label="Accent 4"></button><button class="sw" data-ac="#d6457a" style="background:#d6457a" aria-label="Accent 5"></button></div></div>
+  <div class="card"><h2>Appearance</h2><label class="mu">Theme<select id="sth"><option value="dark">Dark</option><option value="light">Light</option><option value="system">Match system</option></select></label><div class="mu" style="margin-top:12px">Accent color (Personal mode)</div><div class="row" id="acs"><button class="sw" data-ac="" style="background:#818cf8" aria-label="Accent 1"></button><button class="sw" data-ac="#a78bfa" style="background:#a78bfa" aria-label="Accent 2"></button><button class="sw" data-ac="#fb7185" style="background:#fb7185" aria-label="Accent 3"></button><button class="sw" data-ac="#fbbf24" style="background:#fbbf24" aria-label="Accent 4"></button><button class="sw" data-ac="#f472b6" style="background:#f472b6" aria-label="Accent 5"></button></div></div>
   <div class="card"><h2>Sync</h2><div class="mu" id="sync">Loading…</div><div class="row"><button class="p" id="sbtn" disabled>Sign in with Google</button></div></div>
 </section>
 </main>
@@ -188,10 +200,10 @@ function beep(){const k=S.set.snd||'chime';if(k==='off')return;try{const a=new A
 function notify(t,b){if(!('Notification'in window)||Notification.permission!=='granted')return;
  navigator.serviceWorker?.ready.then(r=>r.showNotification(t,{body:b,icon:'icon-192.png',tag:'ff',renotify:true,vibrate:[200,100,200,100,400],requireInteraction:true,silent:false})).catch(()=>new Notification(t,{body:b}))}
 
-function start(mode,min,mini){if(mode==='focus'&&S.set.fa)FM=true;if(mode==='focus'&&!S.clk){const k=S.tasks.find(x=>x.id===S.cur);S.clk={in:mn(Date.now()),task:k?k.t:'',c:k&&k.c||''}}if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
+function start(mode,min,mini){if(mode==='focus'&&S.set.fa)FM=true;if(mode==='focus'&&!S.clk&&S.set.md==='work'){const k=S.tasks.find(x=>x.id===S.cur);S.clk={in:mn(Date.now()),task:k?k.t:'',c:k&&k.c||''}}if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
  S.timer={mode,end:Date.now()+min*6e4,total:min*60,task:S.cur,mini:!!mini};save();render()}
 function brk(){const L=S.cycle%4===0;start(L?'long':'short',L?S.set.l:S.set.s)}
-function done(t){S.log.push({d:day(),m:Math.round(t.total/60),task:t.task,ok:1});const td=day(),y=day(new Date(Date.now()-864e5));
+function done(t){S.log.push({d:day(),m:Math.round(t.total/60),task:t.task,ok:1,w:S.set.md==='work'?1:0});const td=day(),y=day(new Date(Date.now()-864e5));
  if(S.last!==td){S.streak=S.last===y?S.streak+1:1;S.last=td}}
 function finish(){const t=S.timer;S.timer=null;beep();navigator.vibrate&&navigator.vibrate([120,60,120]);
  if(t.mode==='focus'){done(t);if(!t.mini)S.cycle++;notify('Session complete','Nice work.');save();render();
@@ -200,13 +212,13 @@ function finish(){const t=S.timer;S.timer=null;beep();navigator.vibrate&&navigat
  }else{notify('Break over','Ready for the next session?');save();render()}}
 function stop(){const t=S.timer;if(!t)return;
  if(t.mode!=='focus'){S.timer=null;save();render();return}
- const lv=S.set.lv,quit=why=>{S.log.push({d:day(),m:Math.round((t.total-(t.end-Date.now())/1000)/60),task:t.task,ok:0,why,s:lv==='strict'?1:0,h:new Date().getHours()});S.timer=null;save();render();if(S.clk)setTimeout(()=>ask('Session ended. Keep the clock running?',[['Keep running',()=>{}],['Clock out',clockOut,1]]),50)};
+ const lv=S.set.lv,quit=why=>{S.log.push({d:day(),m:Math.round((t.total-(t.end-Date.now())/1000)/60),task:t.task,ok:0,why,s:lv==='strict'?1:0,h:new Date().getHours(),w:S.set.md==='work'?1:0});S.timer=null;save();render();if(S.clk)setTimeout(()=>ask('Session ended. Keep the clock running?',[['Keep running',()=>{}],['Clock out',clockOut,1]]),50)};
  ask('Quit this session? What got in the way?',[['Keep going',()=>{},1],...['Distracted','Too hard','Interrupted','Tired','Other'].map(r=>[r,()=>quit(r)]),...(lv==='gentle'?[['Just stop',()=>quit('')]]:[])])}
 
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 function paint(){const t=S.timer;if(!t)return;const left=Math.max(0,Math.ceil((t.end-Date.now())/1000));
  $('#time').textContent=$('#fmt').textContent=fmt(left);$('#ring').style.strokeDashoffset=603.2*(1-left/t.total);document.title=fmt(left)+' FocusFlow'}
-function tick(){if(S.clk){$('#tclock').textContent=hms(Date.now()-S.clk.in);if(Date.now()-(S.clk.w||S.clk.in)>144e5&&!$('#dlg').open){S.clk.w=Date.now();save();ask('Your clock has been running for hours. Still working?',[['Clock out',clockOut],['Still working',()=>{},1]])}}if(!S.timer)return;S.timer.end<=Date.now()?finish():paint()}
+function tick(){if(S.clk){$('#tclock').textContent=$('#wclk').textContent=$('#cpt').textContent=hms(Date.now()-S.clk.in);if(Date.now()-(S.clk.w||S.clk.in)>144e5&&!$('#dlg').open){S.clk.w=Date.now();save();ask('Your clock has been running for hours. Still working?',[['Clock out',clockOut],['Still working',()=>{},1]])}}if(!S.timer)return;S.timer.end<=Date.now()?finish():paint()}
 
 function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#idle').classList.toggle('hide',!!t);
@@ -214,12 +226,12 @@ function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#stop').textContent=m==='focus'?'Quit':'Skip break';
  $('#lbl').textContent=t?(m==='focus'?(t.mini?'Just 5 minutes':'Focus'):m==='short'?'Break':'Long break'):'Ready';
  if(t)paint();else{$('#time').textContent=fmt(S.set.f*60);$('#ring').style.strokeDashoffset=0;document.title='FocusFlow'}
- const open=S.tasks.filter(x=>!x.done);if(!open.find(x=>x.id===S.cur))S.cur=open[0]?.id||null;
+ const open=S.tasks.filter(x=>!x.done&&isW(x)===(S.set.md==='work'));if(!open.find(x=>x.id===S.cur))S.cur=open[0]?.id||null;
   $('#plist').innerHTML=S.park.map((p,i)=>`<div class="item"><span>${esc(p)}</span><button data-p="${i}" aria-label="Remove">✕</button></div>`).join('');
- {const pin=x=>x.p===day(),L=S.tasks.filter(x=>!x.done).sort((a,b)=>pin(b)-pin(a)),Dn=S.tasks.filter(x=>x.done),P=L.filter(pin),V=SHOWALL?[...L,...Dn]:(P.length?P:L.slice(0,3));
+ {const wm=S.set.md==='work',pin=x=>x.p===day(),L=S.tasks.filter(x=>!x.done&&isW(x)===wm).sort((a,b)=>pin(b)-pin(a)),Dn=S.tasks.filter(x=>x.done&&isW(x)===wm),P=L.filter(pin),V=SHOWALL?[...L,...Dn]:(P.length?P:L.slice(0,3));
  $('#tlist').innerHTML=V.map(x=>{const a=S.log.filter(l=>l.task===x.id&&l.ok).reduce((s,l)=>s+l.m,0),meta=x.est?a+'/'+x.est+' min':a?a+' min':'';return `<div class="item${x.done?' d':''}${x.id===S.cur&&!x.done?' cur':''}" data-t="${x.id}"><input type="checkbox" data-d="${x.id}"${x.done?' checked':''} aria-label="Done"><span>${esc(x.t)}${x.c?'<br><small class="mu">'+esc(x.c)+'</small>':''}</span>${meta?'<small class="mu">'+meta+'</small>':''}${x.done?'':`<button class="star${pin(x)?' on':''}" data-s="${x.id}" aria-label="Top 3 for today">${pin(x)?'★':'☆'}</button>`}<button data-x="${x.id}" aria-label="Delete">✕</button></div>`}).join('')||'<div class="mu">Nothing here yet. What is one small thing you can do first?</div>';
  $('#thint').textContent=!P.length&&L.length>1?'Tap ☆ to choose your top 3 for today.':'';
- $('#tall').classList.toggle('hide',!SHOWALL&&L.length<=V.length&&!Dn.length);$('#tall').textContent=SHOWALL?'Show less':'Show all ('+S.tasks.length+')'}
+ $('#tall').classList.toggle('hide',!SHOWALL&&L.length<=V.length&&!Dn.length);$('#tall').textContent=SHOWALL?'Show less':'Show all ('+(L.length+Dn.length)+')'}
  $('#tasks').classList.toggle('hide',!!t&&t.mode==='focus');
  const td=day(),ok=S.log.filter(l=>l.ok);
  $('#s1').textContent=ok.filter(l=>l.d===td).reduce((a,l)=>a+l.m,0);$('#s2').textContent=wk();$('#s3').textContent=ok.length;
@@ -230,15 +242,15 @@ function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#quits').innerHTML=qe.length?qe.map(([r,n])=>`<div class="item"><span>${esc(r)}</span><b>${n}</b></div>`).join(''):"Nothing yet. That's a good sign.";
  document.querySelectorAll('#lv button').forEach(b=>b.classList.toggle('on',b.dataset.l===S.set.lv));
  $('#lvd').textContent=LVD[S.set.lv];$('#sf').value=S.set.f;$('#ss').value=S.set.s;$('#sl').value=S.set.l;
- $('#parkc').classList.toggle('hide',!(t&&t.mode==='focus'));renderTs();renderHi();renderMore();save()}
+ $('#parkc').classList.toggle('hide',!(t&&t.mode==='focus'));renderTs();renderHi();renderMore();renderMode();save()}
 
 $('#go').onclick=()=>start('focus',S.set.f);
 $('#mini').onclick=()=>start('focus',5,1);
 $('#stop').onclick=stop;
 const addP=()=>{const v=$('#pin').value.trim();if(v){S.park.push(v);$('#pin').value='';render()}};
-$('#padd').onclick=addP;$('#pin').onkeydown=e=>e.key==='Enter'&&addP();
-const addT=()=>{const v=$('#tin').value.trim();if(v){S.tasks.push({id:Date.now()+'',t:v,c:$('#tcin').value.trim(),est:+$('#test').value||0,done:0});$('#tin').value='';$('#test').value='';render()}};
-$('#tadd').onclick=addT;$('#tin').onkeydown=e=>e.key==='Enter'&&addT();
+$('#padd').onclick=addP;$('#pin').onkeydown=e=>{if(e.key==='Enter')addP()};
+const addT=()=>{const v=$('#tin').value.trim();if(v){S.tasks.push({id:Date.now()+'',t:v,c:$('#tcin').value.trim(),est:+$('#test').value||0,w:S.set.md==='work'?1:0,done:0});$('#tin').value='';$('#test').value='';render()}};
+$('#tadd').onclick=addT;$('#tin').onkeydown=e=>{if(e.key==='Enter')addT()};
 $('#plist').onclick=e=>{const i=e.target.dataset.p;if(i!=null){S.park.splice(i,1);render()}};
 
 $('#tlist').onchange=e=>{const k=S.tasks.find(x=>x.id===e.target.dataset.d);if(k){k.done=e.target.checked?1:0;render()}};
@@ -289,12 +301,25 @@ function gen(share){const f=$('#r-f').value,t=$('#r-t').value,c=$('#r-c').value,
  h+='</tbody></table>';
  save();makePdf(h,fn,share)}
 $('#r-g').onclick=()=>gen(0);$('#r-s').onclick=()=>gen(1);
-let SHOWALL=false,FM=false,AC=null,AN=null,AT='';
+const isW=x=>x.w!=null?!!x.w:!!x.c;
+$('#seg').onclick=e=>{const m=e.target.dataset.md;if(m){S.set.md=m;render()}};
+$('#cpill').onclick=()=>{S.set.md='work';render();goTo('time')};
+$('#sth').onchange=e=>{S.set.th=e.target.value;render()};
+$('#wio').onclick=()=>{if(S.clk)return clockOut();const k=S.tasks.find(x=>x.id===S.cur);S.clk={in:mn(Date.now()),task:k?k.t:'',c:k&&k.c||''};render()};
+function renderMode(){const work=S.set.md==='work',k=S.tasks.find(x=>x.id===S.cur);document.body.dataset.md=work?'work':'personal';
+ document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.md===(work?'work':'personal')));
+ $('#wk').classList.toggle('hide',!work);$('nav [data-v=time]').classList.toggle('hide',!work);$('#cpill').classList.toggle('hide',!S.clk);$('#tmore').classList.toggle('hide',!(work||TM));
+ $('#wtxt').textContent=S.clk?((S.clk.c?S.clk.c+' · ':'')+(S.clk.task||'No task')):'Clock in on: '+(k?(k.c?k.c+' · ':'')+k.t:'no task selected');$('#wio').textContent=S.clk?'Clock out':'Clock in';
+ document.documentElement.dataset.t=S.set.th||'dark';$('#sth').value=S.set.th||'dark';
+ if(work){const td=day(),ms=live().filter(e=>dstr(e.in)===td).reduce((a,e)=>a+e.out-e.in,0)+(S.clk?Date.now()-S.clk.in:0);$('#hi').innerHTML='Work<small>'+hm(ms)+' clocked today'+(S.clk?' · running':'')+'</small>'}
+ else if($('#v-time').classList.contains('on'))goTo('timer')}
+let SHOWALL=false,TM=false,FM=false,AC=null,AN=null,AT='';
 function amb(k){if(k===AT)return;AT=k;if(AN){try{AN.stop()}catch(e){}AN=null}if(!k)return;
  try{AC=AC||new AudioContext();AC.resume&&AC.resume();const sr=AC.sampleRate,b=AC.createBuffer(1,sr*3,sr),d=b.getChannelData(0);let l=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;if(k==='brown'){l=(l+.02*w)/1.02;d[i]=l*3.5}else d[i]=w}
  const s=AC.createBufferSource();s.buffer=b;s.loop=true;const g=AC.createGain();g.gain.value=k==='white'?.05:k==='rain'?.1:.25;let n=s;if(k==='rain'){const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=2500;s.connect(f);n=f}n.connect(g);g.connect(AC.destination);s.start();AN=s}catch(e){AT=''}}
 const fm=on=>{FM=on;if(on)(document.documentElement.requestFullscreen?.()||Promise.resolve()).catch(()=>{});else if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});render()};
 $('#fmb').onclick=()=>fm(true);$('#fmx').onclick=()=>fm(false);$('#fmq').onclick=stop;
+$('#fmp').onkeydown=e=>{if(e.key==='Enter')$('#fmpa').click()};
 $('#fmpa').onclick=()=>{const v=$('#fmp').value.trim();if(v){S.park.push(v);$('#fmp').value='';render()}};
 $('#sg').onchange=e=>{S.set.g=Math.max(0,+e.target.value||0);render()};
 $('#ssn').onchange=e=>{S.set.snd=e.target.value;beep();render()};
@@ -318,9 +343,9 @@ async function makePdf(h,name,share){const wrap=document.createElement('div'),bo
  }catch(e){ask("Couldn't create the PDF. Try again, or use Print.",[['Print',()=>{$('#print').innerHTML=h;window.print()}],['OK',()=>{},1]])}finally{wrap.remove()}}
 const wk=()=>{const a=new Set(),b=new Set(),f=day(new Date(Date.now()-6*864e5));S.log.forEach(l=>{if(l.d<f)return;if(l.ok)a.add(l.d);if(l.s)b.add(l.d)});b.forEach(d=>a.delete(d));return a.size};
 $('#tall').onclick=()=>{SHOWALL=!SHOWALL;render()};
-$('#tplus').onclick=()=>$('#tmore').classList.toggle('hide');
+$('#tplus').onclick=()=>{TM=!TM;render()};
 $('#tlist').onclick=e=>{const d=e.target.dataset;if(d.x){S.tasks=S.tasks.filter(x=>x.id!==d.x);render()}else if(d.s){const k=S.tasks.find(x=>x.id===d.s),pn=S.tasks.filter(y=>y.p===day()&&!y.done).length;if(k.p===day()){k.p=0;render()}else if(pn>=3)ask('Your top 3 is full. Unpin one first.',[['OK',()=>{},1]]);else{k.p=day();render()}}else if(e.target.tagName!=='INPUT'){const r=e.target.closest('.item');if(r&&!r.classList.contains('d')){S.cur=r.dataset.t;render()}}};
-function goTo(v){document.querySelectorAll('nav button,section').forEach(x=>x.classList.remove('on'));$('#v-'+v).classList.add('on');const b=document.querySelector('nav [data-v="'+v+'"]');if(b)b.classList.add('on');window.scrollTo(0,0)}
+function goTo(v){if(v==='time'&&S.set.md!=='work')v='timer';document.querySelectorAll('nav button,section').forEach(x=>x.classList.remove('on'));$('#v-'+v).classList.add('on');const b=document.querySelector('nav [data-v="'+v+'"]');if(b)b.classList.add('on');window.scrollTo(0,0)}
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>goTo(b.dataset.v));
 if(!S.set.m2){S.set.lv='gentle';S.set.m2=1;save()}
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
