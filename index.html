@@ -9,7 +9,6 @@
 :root{--bg:#0a0d13;--card:#121721;--line:#222a3a;--tx:#e7eaf2;--mu:#8a93a8;--ac:#818cf8;--acw:#22d3ee;--acb:#34d399;--on:#0a0d13;--hi:rgba(255,255,255,.035);color-scheme:dark}
 :root[data-t=light]{--bg:#eef1f6;--card:#fff;--line:#d8dee9;--tx:#141a26;--mu:#5d6779;--ac:#4f5bd5;--acw:#0891b2;--acb:#0f9d74;--on:#fff;--hi:transparent;color-scheme:light}
 @media(prefers-color-scheme:light){:root[data-t=system]{--bg:#eef1f6;--card:#fff;--line:#d8dee9;--tx:#141a26;--mu:#5d6779;--ac:#4f5bd5;--acw:#0891b2;--acb:#0f9d74;--on:#fff;--hi:transparent;color-scheme:light}}
-body[data-md=work]{--ac:var(--acw)}
 body[data-m=short],body[data-m=long]{--ac:var(--acb)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif;padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom))}
@@ -31,9 +30,7 @@ input,select{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px s
 .rin .big{font-size:clamp(48px,17vw,68px);margin:4px 0}
 .hi{font:600 22px ui-sans-serif,system-ui,sans-serif;letter-spacing:-.01em;margin:4px 2px 14px}.hi small{display:block;font:14px system-ui,sans-serif;color:var(--mu);margin-top:2px}
 .card{box-shadow:0 1px 3px rgba(20,32,43,.06)}button:active{transform:scale(.97)}
-.topbar{display:flex;align-items:center;gap:10px;padding-right:50px;margin-bottom:14px}
-.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
-.seg button{border:0;background:none;border-radius:999px;padding:7px 16px;font-size:14px;color:var(--mu)}.seg button.on{background:var(--ac);color:var(--on);font-weight:600}
+.topbar{position:sticky;top:calc(8px + env(safe-area-inset-top));z-index:4;width:max-content;margin-bottom:12px}
 .pill{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ac);border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--card);font-variant-numeric:tabular-nums;cursor:pointer}
 .pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.6s infinite}
 @keyframes pulse{50%{opacity:.25}}
@@ -106,12 +103,11 @@ dialog label{display:block;margin-top:8px}
 </style></head><body>
 <button class="gear" id="gear" data-v="set" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button>
 <main>
-<div class="topbar"><div class="seg" id="seg"><button data-md="personal">Personal</button><button data-md="work">Work</button></div><div class="pill hide" id="cpill" role="button" tabindex="0"><span id="cpt">0:00:00</span></div></div>
+<div class="topbar hide" id="topbar"><div class="pill" id="cpill" role="button" tabindex="0" title="Open Hours"><span id="cpt">0:00:00</span></div></div>
 <section id="v-timer" class="on">
   <div class="hi" id="hi"></div>
   <div class="cols">
   <div class="colL">
-  <div class="card" id="wk"><div class="mu" id="wtxt">Not clocked in</div><div class="big" id="wclk" style="font-size:44px;margin:6px 0 12px">0:00:00</div><button class="p cta" id="wio">Clock in</button><button id="eodb" style="width:100%;margin-top:8px">End-of-day report</button></div>
   <div class="card tank"><div class="ringw"><svg viewBox="0 0 220 220" aria-hidden="true"><circle class="rt" cx="110" cy="110" r="96"/><circle id="ring" class="rp" cx="110" cy="110" r="96"/></svg>
     <div class="rin"><div class="mu" id="lbl">Ready</div><div class="big" id="time">25:00</div><div class="mu" id="cur"></div></div></div>
   </div>
@@ -124,7 +120,7 @@ dialog label{display:block;margin-top:8px}
   <div class="card" id="tasks">
     <h2>Today</h2><div class="mu" id="thint"></div>
     <div class="row"><input id="tin" placeholder="What's one thing to do?" aria-label="New task"><button id="tplus" aria-label="Add client" style="flex:0">+</button><button class="p" id="tadd" style="flex:0">Add</button></div>
-    <div id="tmore" class="row hide"><input id="tcin" list="cls" placeholder="Client (optional)" aria-label="Client"><input id="test" type="number" min="1" inputmode="numeric" placeholder="Est. min" aria-label="Estimated minutes" style="flex:0 0 100px"></div>
+    <div id="tmore" class="row hide"><input id="tcin" list="cls" placeholder="Client (work tasks track your time)" aria-label="Client"><input id="test" type="number" min="1" inputmode="numeric" placeholder="Est. min" aria-label="Estimated minutes" style="flex:0 0 100px"></div>
     <div id="tlist"></div>
     <button id="tall" class="hide" style="width:100%;margin-top:8px">Show all</button>
   </div>
@@ -141,7 +137,7 @@ dialog label{display:block;margin-top:8px}
   <div class="card">
     <h2>Notes</h2>
     <textarea id="ntx" rows="6" placeholder="Meeting notes, a client message, a brain dump. Start a line with - [ ] or todo to mark it as a task."></textarea>
-    <input id="ncl" list="cls" placeholder="Client (optional)" class="hide" aria-label="Client" style="margin-bottom:8px">
+    <input id="ncl" list="cls" placeholder="Client (optional)" aria-label="Client" style="margin-bottom:8px">
     <div class="row"><button id="nclr" class="hide">Cancel edit</button><button class="p" id="nsv">Save note</button></div>
     <div class="mu">Ctrl+Enter saves.</div>
   </div>
@@ -173,7 +169,7 @@ dialog label{display:block;margin-top:8px}
     <label class="mu">Completion sound<select id="ssn"><option value="chime">Chime</option><option value="bell">Bell</option><option value="soft">Soft</option><option value="off">Off</option></select></label>
     <label class="mu">Ambient sound while focusing<select id="sam"><option value="">Off</option><option value="brown">Brown noise</option><option value="white">White noise</option><option value="rain">Rain</option></select></label>
     <label class="mu" style="display:flex;gap:8px;align-items:center"><input id="sfa" type="checkbox" style="width:auto"> Open focus mode automatically</label></div>
-  <div class="card"><h2>Appearance</h2><label class="mu">Theme<select id="sth"><option value="dark">Dark</option><option value="light">Light</option><option value="system">Match system</option></select></label><div class="mu" style="margin-top:12px">Accent color (Personal mode)</div><div class="row" id="acs"><button class="sw" data-ac="" style="background:#818cf8" aria-label="Accent 1"></button><button class="sw" data-ac="#a78bfa" style="background:#a78bfa" aria-label="Accent 2"></button><button class="sw" data-ac="#fb7185" style="background:#fb7185" aria-label="Accent 3"></button><button class="sw" data-ac="#fbbf24" style="background:#fbbf24" aria-label="Accent 4"></button><button class="sw" data-ac="#f472b6" style="background:#f472b6" aria-label="Accent 5"></button></div></div>
+  <div class="card"><h2>Appearance</h2><label class="mu">Theme<select id="sth"><option value="dark">Dark</option><option value="light">Light</option><option value="system">Match system</option></select></label><div class="mu" style="margin-top:12px">Accent color</div><div class="row" id="acs"><button class="sw" data-ac="" style="background:#818cf8" aria-label="Accent 1"></button><button class="sw" data-ac="#a78bfa" style="background:#a78bfa" aria-label="Accent 2"></button><button class="sw" data-ac="#fb7185" style="background:#fb7185" aria-label="Accent 3"></button><button class="sw" data-ac="#fbbf24" style="background:#fbbf24" aria-label="Accent 4"></button><button class="sw" data-ac="#f472b6" style="background:#f472b6" aria-label="Accent 5"></button></div></div>
   <div class="card"><h2>Sync</h2><div class="mu" id="sync">Loading…</div><div class="row"><button class="p" id="sbtn" disabled>Sign in with Google</button></div></div>
 </section>
 </main>
@@ -220,10 +216,10 @@ function beep(){const k=S.set.snd||'chime';if(k==='off')return;try{const a=new A
 function notify(t,b){if(!('Notification'in window)||Notification.permission!=='granted')return;
  navigator.serviceWorker?.ready.then(r=>r.showNotification(t,{body:b,icon:'icon-192.png',tag:'ff',renotify:true,vibrate:[200,100,200,100,400],requireInteraction:true,silent:false})).catch(()=>new Notification(t,{body:b}))}
 
-function start(mode,min,mini){if(mode==='focus'&&S.set.fa)FM=true;if(mode==='focus'&&!S.clk&&S.set.md==='work'){const k=S.tasks.find(x=>x.id===S.cur);S.clk={in:mn(Date.now()),task:k?k.t:'',c:k&&k.c||''}}if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
+function start(mode,min,mini){if(mode==='focus'&&S.set.fa)FM=true;if(mode==='focus'&&!S.clk){const k=S.tasks.find(x=>x.id===S.cur);if(k&&isW(k))S.clk={in:mn(Date.now()),task:k.t,c:k.c||''}}if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
  S.timer={mode,end:Date.now()+min*6e4,total:min*60,task:S.cur,mini:!!mini};save();render()}
 function brk(){const L=S.cycle%4===0;start(L?'long':'short',L?S.set.l:S.set.s)}
-function done(t){S.log.push({d:day(),m:Math.round(t.total/60),task:t.task,ok:1,w:S.set.md==='work'?1:0});const td=day(),y=day(new Date(Date.now()-864e5));
+function done(t){S.log.push({d:day(),m:Math.round(t.total/60),task:t.task,ok:1,w:wOf(t.task)});const td=day(),y=day(new Date(Date.now()-864e5));
  if(S.last!==td){S.streak=S.last===y?S.streak+1:1;S.last=td}}
 function finish(){const t=S.timer;S.timer=null;beep();navigator.vibrate&&navigator.vibrate([120,60,120]);
  if(t.mode==='focus'){done(t);if(!t.mini)S.cycle++;notify('Session complete','Nice work.');save();render();
@@ -232,13 +228,13 @@ function finish(){const t=S.timer;S.timer=null;beep();navigator.vibrate&&navigat
  }else{notify('Break over','Ready for the next session?');save();render()}}
 function stop(){const t=S.timer;if(!t)return;
  if(t.mode!=='focus'){S.timer=null;save();render();return}
- const lv=S.set.lv,quit=why=>{S.log.push({d:day(),m:Math.round((t.total-(t.end-Date.now())/1000)/60),task:t.task,ok:0,why,s:lv==='strict'?1:0,h:new Date().getHours(),w:S.set.md==='work'?1:0});S.timer=null;save();render();if(S.clk)setTimeout(()=>ask('Session ended. Keep the clock running?',[['Keep running',()=>{}],['Clock out',clockOut,1]]),50)};
+ const lv=S.set.lv,quit=why=>{S.log.push({d:day(),m:Math.round((t.total-(t.end-Date.now())/1000)/60),task:t.task,ok:0,why,s:lv==='strict'?1:0,h:new Date().getHours(),w:wOf(t.task)});S.timer=null;save();render();if(S.clk)setTimeout(()=>ask('Session ended. Keep the clock running?',[['Keep running',()=>{}],['Clock out',clockOut,1]]),50)};
  ask('Quit this session? What got in the way?',[['Keep going',()=>{},1],...['Distracted','Too hard','Interrupted','Tired','Other'].map(r=>[r,()=>quit(r)]),...(lv==='gentle'?[['Just stop',()=>quit('')]]:[])])}
 
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 function paint(){const t=S.timer;if(!t)return;const left=Math.max(0,Math.ceil((t.end-Date.now())/1000));
  $('#time').textContent=$('#fmt').textContent=fmt(left);$('#ring').style.strokeDashoffset=603.2*(1-left/t.total);document.title=fmt(left)+' FocusFlow'}
-function tick(){if(S.clk){$('#tclock').textContent=$('#wclk').textContent=$('#cpt').textContent=hms(Date.now()-S.clk.in);if(Date.now()-(S.clk.w||S.clk.in)>144e5&&!$('#dlg').open){S.clk.w=Date.now();save();ask('Your clock has been running for hours. Still working?',[['Clock out',clockOut],['Still working',()=>{},1]])}}if(!S.timer)return;S.timer.end<=Date.now()?finish():paint()}
+function tick(){if(S.clk){$('#tclock').textContent=$('#cpt').textContent=hms(Date.now()-S.clk.in);if(Date.now()-(S.clk.w||S.clk.in)>144e5&&!$('#dlg').open){S.clk.w=Date.now();save();ask('Your clock has been running for hours. Still working?',[['Clock out',clockOut],['Still working',()=>{},1]])}}if(!S.timer)return;S.timer.end<=Date.now()?finish():paint()}
 
 function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#idle').classList.toggle('hide',!!t);
@@ -246,9 +242,9 @@ function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#stop').textContent=m==='focus'?'Quit':'Skip break';
  $('#lbl').textContent=t?(m==='focus'?(t.mini?'Just 5 minutes':'Focus'):m==='short'?'Break':'Long break'):'Ready';
  if(t)paint();else{$('#time').textContent=fmt(S.set.f*60);$('#ring').style.strokeDashoffset=0;document.title='FocusFlow'}
- const open=S.tasks.filter(x=>!x.done&&isW(x)===(S.set.md==='work'));if(!open.find(x=>x.id===S.cur))S.cur=open[0]?.id||null;
+ const open=S.tasks.filter(x=>!x.done);if(!open.find(x=>x.id===S.cur))S.cur=open[0]?.id||null;
   $('#plist').innerHTML=S.park.map((p,i)=>`<div class="item"><span>${esc(p)}</span><button data-p="${i}" aria-label="Remove">✕</button></div>`).join('');
- {const wm=S.set.md==='work',pin=x=>x.p===day(),L=S.tasks.filter(x=>!x.done&&isW(x)===wm).sort((a,b)=>pin(b)-pin(a)),Dn=S.tasks.filter(x=>x.done&&isW(x)===wm),P=L.filter(pin),V=SHOWALL?[...L,...Dn]:(P.length?P:L.slice(0,3));
+ {const pin=x=>x.p===day(),L=S.tasks.filter(x=>!x.done).sort((a,b)=>pin(b)-pin(a)),Dn=S.tasks.filter(x=>x.done),P=L.filter(pin),V=SHOWALL?[...L,...Dn]:(P.length?P:L.slice(0,3));
  $('#tlist').innerHTML=V.map(x=>{const a=S.log.filter(l=>l.task===x.id&&l.ok).reduce((s,l)=>s+l.m,0),meta=x.est?a+'/'+x.est+' min':a?a+' min':'';return `<div class="item${x.done?' d':''}${x.id===S.cur&&!x.done?' cur':''}" data-t="${x.id}"><input type="checkbox" data-d="${x.id}"${x.done?' checked':''} aria-label="Done"><span>${esc(x.t)}${x.c?'<br><small class="mu">'+esc(x.c)+'</small>':''}</span>${meta?'<small class="mu">'+meta+'</small>':''}${x.done?'':`<button class="star${pin(x)?' on':''}" data-s="${x.id}" aria-label="Top 3 for today">${pin(x)?'★':'☆'}</button>`}<button data-x="${x.id}" aria-label="Delete">✕</button></div>`}).join('')||'<div class="mu">Nothing here yet. What is one small thing you can do first?</div>';
  $('#thint').textContent=!P.length&&L.length>1?'Tap ☆ to choose your top 3 for today.':'';
  $('#tall').classList.toggle('hide',!SHOWALL&&L.length<=V.length&&!Dn.length);$('#tall').textContent=SHOWALL?'Show less':'Show all ('+(L.length+Dn.length)+')'}
@@ -269,7 +265,7 @@ $('#mini').onclick=()=>start('focus',5,1);
 $('#stop').onclick=stop;
 const addP=()=>{const v=$('#pin').value.trim();if(v){S.park.push(v);$('#pin').value='';render()}};
 $('#padd').onclick=addP;$('#pin').onkeydown=e=>{if(e.key==='Enter')addP()};
-const addT=()=>{const v=$('#tin').value.trim();if(v){S.tasks.push({id:Date.now()+'',t:v,c:$('#tcin').value.trim(),est:+$('#test').value||0,w:S.set.md==='work'?1:0,done:0});$('#tin').value='';$('#test').value='';render()}};
+const addT=()=>{const v=$('#tin').value.trim();if(v){S.tasks.push({id:Date.now()+'',t:v,c:$('#tcin').value.trim(),est:+$('#test').value||0,w:$('#tcin').value.trim()?1:0,done:0});$('#tin').value='';$('#test').value='';render()}};
 $('#tadd').onclick=addT;$('#tin').onkeydown=e=>{if(e.key==='Enter')addT()};
 $('#plist').onclick=e=>{const i=e.target.dataset.p;if(i!=null){S.park.splice(i,1);render()}};
 
@@ -295,7 +291,7 @@ $('#ttask').oninput=e=>{const k=S.tasks.find(x=>!x.done&&x.t===e.target.value);i
 $('#acs').onclick=e=>{const a=e.target.dataset.ac;if(a!=null){S.set.ac=a;render()}};
 function renderHi(){const h=new Date().getHours(),td=day(),m=S.log.filter(l=>l.ok&&l.d===td).reduce((a,l)=>a+l.m,0),t=S.timer,k=S.tasks.find(x=>x.id===(t?t.task:S.cur));$('#go').textContent='Start focus · '+S.set.f+' min';
  const g=S.set.g==null?120:S.set.g;$('#hi').innerHTML=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+`<small>${m?m+' min focused today':'Nothing focused yet today. Start small.'}${wk()?' · '+wk()+'/7 days this week':''}</small>`+(g?`<div class="gb"><i style="width:${Math.min(100,m/g*100)}%"></i></div><small>${m>=g?'Daily goal reached. Nice work.':m+' / '+g+' min'}</small>`:'');
- $('#cur').textContent=k?k.t:'';document.documentElement.style.setProperty('--ac',S.set.ac||'');
+ $('#cur').textContent=k?k.t+(k.c?' · '+k.c:''):'';document.documentElement.style.setProperty('--ac',S.set.ac||'');
  document.querySelectorAll('#acs button').forEach(b=>b.classList.toggle('on',b.dataset.ac===(S.set.ac||'')))}
 let EID=null;
 function edit(id){EID=id;const e=S.ts.find(x=>x.id===id)||{in:new Date().setHours(9,0,0,0),out:new Date().setHours(17,0,0,0),task:'',c:''};
@@ -325,7 +321,7 @@ const isTodo=l=>/^\s*(-\s*\[\s?\]|\[\s?\]|[-*]?\s*(todo|to-do|action|task)\b[:\-
 const clean=l=>l.replace(/^\s*(-\s*\[\s?\]|\[\s?\]|[-*]?\s*(todo|to-do|action|task)\b[:\-]?|[-*•]\s)\s*/i,'').trim();
 const mkTask=(n,l)=>{const t=clean(l);if(!t)return;S.tasks.push({id:Date.now()+''+Math.floor(Math.random()*999),t,c:n.c||'',est:0,w:n.w?1:0,done:0,fn:n.id});n.tk=[...(n.tk||[]),t];n.u=Date.now()};
 let NID=null;
-function renderNotes(){const work=S.set.md==='work',N=(S.notes||[]).filter(n=>!n.del&&!!n.w===work).sort((a,b)=>b.d-a.d);$('#ncl').classList.toggle('hide',!work);
+function renderNotes(){const N=(S.notes||[]).filter(n=>!n.del).sort((a,b)=>b.d-a.d);
  $('#nlist').innerHTML=N.map(n=>{const L=n.txt.split('\n'),tk=n.tk||[],sg=L.filter(l=>isTodo(l)&&!tk.includes(clean(l))).length;
   return `<div class="note"><div class="mu">${new Date(n.d).toLocaleString([],{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})}${n.c?' · '+esc(n.c):''}${n.k?' · while clocked in':''}</div>`+L.map((l,i)=>l.trim()?`<div class="nl${isTodo(l)?' td':''}"><span dir="auto">${esc(l)}</span>${tk.includes(clean(l))?'<small class="mu">✓ task</small>':`<button data-t="${n.id}|${i}">+ Task</button>`}</div>`:'').join('')+`<div class="row">${sg?`<button data-all="${n.id}">Add ${sg} suggested</button>`:''}<button data-e="${n.id}">Edit</button><button data-d="${n.id}">Delete</button></div></div>`}).join('')||'<div class="mu">No notes yet. Jot down anything, then turn lines into tasks.</div>'}
 $('#nlist').onclick=e=>{const d=e.target.dataset,f=id=>(S.notes||[]).find(x=>x.id===id);
@@ -334,7 +330,7 @@ $('#nlist').onclick=e=>{const d=e.target.dataset,f=id=>(S.notes||[]).find(x=>x.i
  else if(d.e){const n=f(d.e);if(n){NID=n.id;$('#ntx').value=n.txt;$('#ncl').value=n.c||'';$('#nclr').classList.remove('hide');$('#nsv').textContent='Update note';$('#ntx').focus()}}
  else if(d.d)ask('Delete this note?',[['Cancel',()=>{}],['Delete',()=>{const n=f(d.d);if(n){n.del=1;n.u=Date.now()}render()},1]])};
 $('#nclr').onclick=()=>{NID=null;$('#ntx').value='';$('#nclr').classList.add('hide');$('#nsv').textContent='Save note'};
-const saveNote=()=>{const t=$('#ntx').value.trim();if(!t)return;const w=S.set.md==='work',c=$('#ncl').value.trim()||(w&&S.clk&&S.clk.c)||'';S.notes=S.notes||[];
+const saveNote=()=>{const t=$('#ntx').value.trim();if(!t)return;const c=$('#ncl').value.trim()||(S.clk&&S.clk.c)||'',w=(c||S.clk)?1:0;S.notes=S.notes||[];
  if(NID){const n=S.notes.find(x=>x.id===NID);if(n){n.txt=t;n.c=c;n.u=Date.now()}}else S.notes.push({id:Date.now()+'',txt:t,c,w:w?1:0,k:S.clk?1:0,d:Date.now(),u:Date.now()});
  $('#nclr').click();$('#ncl').value='';render()};
 $('#nsv').onclick=saveNote;$('#ntx').onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();saveNote()}};
@@ -351,22 +347,15 @@ function eodText(ds,blk){const E=live().filter(e=>dstr(e.in)===ds).sort((a,b)=>a
  if(blk)L.push('','Blockers: '+blk);return L.join('\n')}
 const eoGen=()=>{$('#eo-t').value=eodText($('#eo-d').value,$('#eo-b').value.trim())};
 function openEod(){$('#eo-d').value=day();$('#eo-b').value='';eoGen();$('#eo-sh').classList.toggle('hide',!navigator.share);$('#eodlg').showModal()}
-$('#eo-d').onchange=eoGen;$('#eo-b').onchange=eoGen;$('#eod').onclick=openEod;$('#eodb').onclick=openEod;$('#eo-x').onclick=()=>$('#eodlg').close();
+$('#eo-d').onchange=eoGen;$('#eo-b').onchange=eoGen;$('#eod').onclick=openEod;$('#eo-x').onclick=()=>$('#eodlg').close();
 $('#eo-c').onclick=async()=>{const v=$('#eo-t').value;try{await navigator.clipboard.writeText(v)}catch(e){$('#eo-t').select();document.execCommand('copy')}$('#eo-c').textContent='Copied';setTimeout(()=>$('#eo-c').textContent='Copy text',1500)};
 $('#eo-sh').onclick=()=>navigator.share({title:'End-of-day report',text:$('#eo-t').value}).catch(()=>{});
 $('#eo-pdf').onclick=()=>{const v=$('#eo-t').value.split('\n');makePdf('<h1>End-of-day report</h1><div class="sub">'+esc(dlong($('#eo-d').value))+'</div><pre dir="auto" style="white-space:pre-wrap;font:12px/1.7 Arial,Helvetica,sans-serif;margin:18px 0 0">'+esc(v.slice(1).join('\n'))+'</pre>','End_of_day_report_'+$('#eo-d').value+'.pdf',0)};
 const isW=x=>x.w!=null?!!x.w:!!x.c;
-$('#seg').onclick=e=>{const m=e.target.dataset.md;if(m){S.set.md=m;render()}};
-$('#cpill').onclick=()=>{S.set.md='work';render();goTo('time')};
+$('#cpill').onclick=()=>goTo('time');
 $('#sth').onchange=e=>{S.set.th=e.target.value;render()};
-$('#wio').onclick=()=>{if(S.clk)return clockOut();const k=S.tasks.find(x=>x.id===S.cur);S.clk={in:mn(Date.now()),task:k?k.t:'',c:k&&k.c||''};render()};
-function renderMode(){const work=S.set.md==='work',k=S.tasks.find(x=>x.id===S.cur);document.body.dataset.md=work?'work':'personal';
- document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.md===(work?'work':'personal')));
- $('#wk').classList.toggle('hide',!work);$('nav [data-v=time]').classList.toggle('hide',!work);$('#cpill').classList.toggle('hide',!S.clk);$('#tmore').classList.toggle('hide',!(work||TM));
- $('#wtxt').textContent=S.clk?((S.clk.c?S.clk.c+' · ':'')+(S.clk.task||'No task')):'Clock in on: '+(k?(k.c?k.c+' · ':'')+k.t:'no task selected');$('#wio').textContent=S.clk?'Clock out':'Clock in';
- document.documentElement.dataset.t=S.set.th||'dark';$('#sth').value=S.set.th||'dark';
- if(work){const td=day(),ms=live().filter(e=>dstr(e.in)===td).reduce((a,e)=>a+e.out-e.in,0)+(S.clk?Date.now()-S.clk.in:0);$('#hi').innerHTML='Work<small>'+hm(ms)+' clocked today'+(S.clk?' · running':'')+'</small>'}
- else if($('#v-time').classList.contains('on'))goTo('timer')}
+function renderMode(){$('#topbar').classList.toggle('hide',!S.clk);$('#tmore').classList.toggle('hide',!TM);document.documentElement.dataset.t=S.set.th||'dark';$('#sth').value=S.set.th||'dark'}
+const wOf=id=>{const k=S.tasks.find(x=>x.id===id);return k&&isW(k)?1:0};
 let SHOWALL=false,TM=false,FM=false,AC=null,AN=null,AT='';
 function amb(k){if(k===AT)return;AT=k;if(AN){try{AN.stop()}catch(e){}AN=null}if(!k)return;
  try{AC=AC||new AudioContext();AC.resume&&AC.resume();const sr=AC.sampleRate,b=AC.createBuffer(1,sr*3,sr),d=b.getChannelData(0);let l=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;if(k==='brown'){l=(l+.02*w)/1.02;d[i]=l*3.5}else d[i]=w}
@@ -399,7 +388,7 @@ const wk=()=>{const a=new Set(),b=new Set(),f=day(new Date(Date.now()-6*864e5));
 $('#tall').onclick=()=>{SHOWALL=!SHOWALL;render()};
 $('#tplus').onclick=()=>{TM=!TM;render()};
 $('#tlist').onclick=e=>{const d=e.target.dataset;if(d.x){S.tasks=S.tasks.filter(x=>x.id!==d.x);render()}else if(d.s){const k=S.tasks.find(x=>x.id===d.s),pn=S.tasks.filter(y=>y.p===day()&&!y.done).length;if(k.p===day()){k.p=0;render()}else if(pn>=3)ask('Your top 3 is full. Unpin one first.',[['OK',()=>{},1]]);else{k.p=day();render()}}else if(e.target.tagName!=='INPUT'){const r=e.target.closest('.item');if(r&&!r.classList.contains('d')){S.cur=r.dataset.t;render()}}};
-function goTo(v){if(v==='time'&&S.set.md!=='work')v='timer';document.querySelectorAll('nav button,section').forEach(x=>x.classList.remove('on'));$('#v-'+v).classList.add('on');const b=document.querySelector('nav [data-v="'+v+'"]');if(b)b.classList.add('on');window.scrollTo(0,0)}
+function goTo(v){document.querySelectorAll('nav button,section').forEach(x=>x.classList.remove('on'));$('#v-'+v).classList.add('on');const b=document.querySelector('nav [data-v="'+v+'"]');if(b)b.classList.add('on');window.scrollTo(0,0)}
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>goTo(b.dataset.v));
 if(!S.set.m2){S.set.lv='gentle';S.set.m2=1;save()}
 setInterval(tick,250);document.addEventListener('visibilitychange',tick);
