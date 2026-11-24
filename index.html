@@ -37,6 +37,10 @@ input,select{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px s
 .pill{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ac);border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--card);font-variant-numeric:tabular-nums;cursor:pointer}
 .pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.6s infinite}
 @keyframes pulse{50%{opacity:.25}}
+textarea{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--tx);resize:vertical;margin-bottom:8px}textarea:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.note{padding:12px 0;border-top:1px solid var(--line)}.note:first-child{border-top:0}
+.nl{display:flex;align-items:center;gap:8px;padding:5px 0}.nl span{flex:1;white-space:pre-wrap;word-break:break-word;color:var(--mu)}.nl.td span{color:var(--tx);font-weight:600}.nl button{padding:5px 10px;font-size:13px;flex:0 0 auto}
+.note .row button{font-size:13px;padding:8px 10px}
 section.on{animation:sin .25s ease}@keyframes sin{from{opacity:0;transform:translateY(6px)}}
 button{transition:border-color .15s,filter .15s,transform .1s}button:hover{border-color:var(--ac)}button.p:hover{filter:brightness(1.1)}
 .cta{width:100%;padding:18px;font-size:18px}#go{width:100%;margin-top:8px}
@@ -88,7 +92,8 @@ nav{top:0;right:auto;width:224px;flex-direction:column;gap:4px;border-top:0;bord
 nav button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;font-size:15px;padding:12px 14px;border-radius:10px;width:100%}
 nav button.on{background:var(--bg)}
 .big{font-size:112px}.rin .big{font-size:72px}#tclock{font-size:84px!important}
-#v-time.on,#v-stats.on,#v-set.on{display:grid;gap:0 18px;align-items:start}
+#v-notes.on,#v-time.on,#v-stats.on,#v-set.on{display:grid;gap:0 18px;align-items:start}
+#v-notes.on{grid-template-columns:1fr 1.3fr}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
 #parkc.hide{display:block!important}
 #v-time.on{grid-template-columns:360px 1fr}#v-time>.card:nth-child(3){grid-column:2;grid-row:1/span 2}
@@ -106,7 +111,7 @@ dialog label{display:block;margin-top:8px}
   <div class="hi" id="hi"></div>
   <div class="cols">
   <div class="colL">
-  <div class="card" id="wk"><div class="mu" id="wtxt">Not clocked in</div><div class="big" id="wclk" style="font-size:44px;margin:6px 0 12px">0:00:00</div><button class="p cta" id="wio">Clock in</button></div>
+  <div class="card" id="wk"><div class="mu" id="wtxt">Not clocked in</div><div class="big" id="wclk" style="font-size:44px;margin:6px 0 12px">0:00:00</div><button class="p cta" id="wio">Clock in</button><button id="eodb" style="width:100%;margin-top:8px">End-of-day report</button></div>
   <div class="card tank"><div class="ringw"><svg viewBox="0 0 220 220" aria-hidden="true"><circle class="rt" cx="110" cy="110" r="96"/><circle id="ring" class="rp" cx="110" cy="110" r="96"/></svg>
     <div class="rin"><div class="mu" id="lbl">Ready</div><div class="big" id="time">25:00</div><div class="mu" id="cur"></div></div></div>
   </div>
@@ -132,6 +137,16 @@ dialog label{display:block;margin-top:8px}
   </div>
   </div>
 </section>
+<section id="v-notes">
+  <div class="card">
+    <h2>Notes</h2>
+    <textarea id="ntx" rows="6" placeholder="Meeting notes, a client message, a brain dump. Start a line with - [ ] or todo to mark it as a task."></textarea>
+    <input id="ncl" list="cls" placeholder="Client (optional)" class="hide" aria-label="Client" style="margin-bottom:8px">
+    <div class="row"><button id="nclr" class="hide">Cancel edit</button><button class="p" id="nsv">Save note</button></div>
+    <div class="mu">Ctrl+Enter saves.</div>
+  </div>
+  <div class="card"><div id="nlist"></div></div>
+</section>
 <section id="v-time">
   <div class="card tank"><div class="mu" id="tstate">Not clocked in</div><div class="big" id="tclock" style="font-size:64px">0:00:00</div></div>
   <div class="card">
@@ -139,7 +154,7 @@ dialog label{display:block;margin-top:8px}
     <input id="ttask" list="tl" placeholder="What are you working on?" style="margin-top:8px" aria-label="Task"><datalist id="tl"></datalist>
     <div class="row"><button class="p" id="tio">Clock in</button></div>
   </div>
-  <div class="card"><div class="row"><button id="tadd2">+ Add entry</button><button class="p" id="trep">PDF report</button></div><div id="tents"></div></div>
+  <div class="card"><div class="row"><button id="tadd2">+ Add entry</button><button class="p" id="trep">PDF report</button></div><button id="eod" style="width:100%;margin-top:8px">End-of-day report</button><div id="tents"></div></div>
 </section>
 <section id="v-stats">
   <div class="card stats"><div><b id="s1">0</b><span class="mu">min today</span></div><div><b id="s2">0</b><span class="mu">days this week</span></div><div><b id="s3">0</b><span class="mu">sessions</span></div></div>
@@ -162,7 +177,7 @@ dialog label{display:block;margin-top:8px}
   <div class="card"><h2>Sync</h2><div class="mu" id="sync">Loading…</div><div class="row"><button class="p" id="sbtn" disabled>Sign in with Google</button></div></div>
 </section>
 </main>
-<nav><div class="brand">FocusFlow</div><button data-v="timer" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span>Today</span></button><button data-v="time"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Hours</span></button><button data-v="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>Progress</span></button></nav>
+<nav><div class="brand">FocusFlow</div><button data-v="timer" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span>Today</span></button><button data-v="notes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg><span>Notes</span></button><button data-v="time"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Hours</span></button><button data-v="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>Progress</span></button></nav>
 <dialog id="edlg"><h2 id="edt">Entry</h2>
  <label class="mu">Date<input type="date" id="ed-d"></label>
  <div class="row"><label class="mu">In<input type="time" id="ed-i"></label><label class="mu">Out<input type="time" id="ed-o"></label></div>
@@ -175,6 +190,11 @@ dialog label{display:block;margin-top:8px}
  <label class="mu">Your name<input id="r-n"></label>
  <div class="row"><label class="mu">Rate / hour (optional)<input id="r-r" type="number" min="0" step="any" inputmode="decimal"></label><label class="mu">Currency (optional)<input id="r-u" placeholder="USD"></label></div>
  <div class="row"><button id="r-x">Cancel</button><button id="r-s" class="hide">Share…</button><button class="p" id="r-g">Download PDF</button></div></dialog>
+<dialog id="eodlg"><h2>End-of-day report</h2>
+ <label class="mu">Date<input type="date" id="eo-d"></label>
+ <label class="mu">Blockers (optional)<input id="eo-b" placeholder="Anything holding you up?"></label>
+ <label class="mu">Report (you can edit it)<textarea id="eo-t" rows="14"></textarea></label>
+ <div class="row"><button id="eo-x">Close</button><button id="eo-sh" class="hide">Share…</button><button id="eo-pdf">PDF</button><button class="p" id="eo-c">Copy text</button></div></dialog>
 <div id="print" class="rpt"></div>
 <div id="fm" class="hide"><div class="mu" id="fml">Focus</div><div class="big" id="fmt">25:00</div><div class="mu" id="fmc"></div>
  <div class="row"><input id="fmp" placeholder="Park a thought"><button id="fmpa" style="flex:0">Park</button></div>
@@ -183,13 +203,13 @@ dialog label{display:block;margin-top:8px}
 <script>
 const $=s=>document.querySelector(s),K='focusflow.v1',day=d=>(d||new Date()).toLocaleDateString('en-CA');
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let S=Object.assign({set:{f:25,s:5,l:15,lv:'gentle'},tasks:[],log:[],park:[],streak:0,last:null,cycle:0,timer:null,cur:null,ts:[],clk:null,inv:{}},JSON.parse(localStorage.getItem(K)||'null')||{});
-const pick=o=>({set:o.set,tasks:o.tasks,log:o.log,park:o.park,streak:o.streak,last:o.last,cycle:o.cycle,timer:o.timer,cur:o.cur,ts:o.ts||[],clk:o.clk||null,inv:o.inv||{}});
+let S=Object.assign({set:{f:25,s:5,l:15,lv:'gentle'},tasks:[],log:[],park:[],streak:0,last:null,cycle:0,timer:null,cur:null,ts:[],notes:[],clk:null,inv:{}},JSON.parse(localStorage.getItem(K)||'null')||{});
+const pick=o=>({set:o.set,tasks:o.tasks,log:o.log,park:o.park,streak:o.streak,last:o.last,cycle:o.cycle,timer:o.timer,cur:o.cur,ts:o.ts||[],notes:o.notes||[],clk:o.clk||null,inv:o.inv||{}});
 let lastJ=JSON.stringify(pick(S));
 const save=()=>{const j=JSON.stringify(pick(S));if(j!==lastJ){lastJ=j;S.u=Date.now();window.cloudPush&&cloudPush()}localStorage.setItem(K,JSON.stringify(S))};
 window.FF={get:()=>({p:pick(S),u:S.u||0}),
- apply:r=>{const m=mergeTs(S.ts,r.ts||[]),rm=new Map((r.ts||[]).map(e=>[e.id,e.u])),ch=m.some(e=>rm.get(e.id)!==e.u);Object.assign(S,pick(r),{ts:m,u:r.u});lastJ=JSON.stringify(pick(S));localStorage.setItem(K,JSON.stringify(S));render();if(ch){lastJ='';save()}},
- merge:rts=>{const m=mergeTs(S.ts,rts||[]);if(JSON.stringify(m)!==JSON.stringify(S.ts)){S.ts=m;lastJ='';save();render()}else window.cloudPush&&cloudPush()}};
+ apply:r=>{const m=mergeTs(S.ts,r.ts||[]),n2=mergeTs(S.notes||[],r.notes||[]),chg=(x,y)=>{const rm=new Map(y.map(e=>[e.id,e.u]));return x.some(e=>rm.get(e.id)!==e.u)},ch=chg(m,r.ts||[])||chg(n2,r.notes||[]);Object.assign(S,pick(r),{ts:m,notes:n2,u:r.u});lastJ=JSON.stringify(pick(S));localStorage.setItem(K,JSON.stringify(S));render();if(ch){lastJ='';save()}},
+ merge:(rts,rn)=>{const m=mergeTs(S.ts,rts||[]),n2=mergeTs(S.notes||[],rn||[]);if(JSON.stringify(m)!==JSON.stringify(S.ts)||JSON.stringify(n2)!==JSON.stringify(S.notes||[])){S.ts=m;S.notes=n2;lastJ='';save();render()}else window.cloudPush&&cloudPush()}};
 const LVD={gentle:'Skip breaks and quit any time, with an optional reason.',firm:"Quitting needs a reason. Breaks can't be skipped.",strict:"Firm rules, and a quit means that day doesn't count toward your week."};
 
 function ask(msg,btns,inp){$('#dm').textContent=msg;const i=$('#di');i.classList.toggle('hide',!inp);i.value='';const b=$('#db');b.innerHTML='';
@@ -208,7 +228,7 @@ function done(t){S.log.push({d:day(),m:Math.round(t.total/60),task:t.task,ok:1,w
 function finish(){const t=S.timer;S.timer=null;beep();navigator.vibrate&&navigator.vibrate([120,60,120]);
  if(t.mode==='focus'){done(t);if(!t.mini)S.cycle++;notify('Session complete','Nice work.');save();render();
   if(t.mini)ask('5 minutes done. Keep going?',[['Stop here',()=>{}],['Full session',()=>start('focus',S.set.f),1]]);
-  else ask('Nice work. What next?',[['Keep going +10 min',()=>start('focus',10)],['Task done',()=>{const k=S.tasks.find(x=>x.id===t.task);if(k)k.done=1;save();render();brk()}],['Take a break',brk,1]]);
+  else ask('Nice work. What next?',[['Keep going +10 min',()=>start('focus',10)],['Task done',()=>{const k=S.tasks.find(x=>x.id===t.task);if(k){k.done=1;k.dt=Date.now()}save();render();brk()}],['Take a break',brk,1]]);
  }else{notify('Break over','Ready for the next session?');save();render()}}
 function stop(){const t=S.timer;if(!t)return;
  if(t.mode!=='focus'){S.timer=null;save();render();return}
@@ -242,7 +262,7 @@ function render(){const t=S.timer,m=t?t.mode:'idle';document.body.dataset.m=m;
  $('#quits').innerHTML=qe.length?qe.map(([r,n])=>`<div class="item"><span>${esc(r)}</span><b>${n}</b></div>`).join(''):"Nothing yet. That's a good sign.";
  document.querySelectorAll('#lv button').forEach(b=>b.classList.toggle('on',b.dataset.l===S.set.lv));
  $('#lvd').textContent=LVD[S.set.lv];$('#sf').value=S.set.f;$('#ss').value=S.set.s;$('#sl').value=S.set.l;
- $('#parkc').classList.toggle('hide',!(t&&t.mode==='focus'));renderTs();renderHi();renderMore();renderMode();save()}
+ $('#parkc').classList.toggle('hide',!(t&&t.mode==='focus'));renderTs();renderHi();renderMore();renderMode();renderNotes();save()}
 
 $('#go').onclick=()=>start('focus',S.set.f);
 $('#mini').onclick=()=>start('focus',5,1);
@@ -253,7 +273,7 @@ const addT=()=>{const v=$('#tin').value.trim();if(v){S.tasks.push({id:Date.now()
 $('#tadd').onclick=addT;$('#tin').onkeydown=e=>{if(e.key==='Enter')addT()};
 $('#plist').onclick=e=>{const i=e.target.dataset.p;if(i!=null){S.park.splice(i,1);render()}};
 
-$('#tlist').onchange=e=>{const k=S.tasks.find(x=>x.id===e.target.dataset.d);if(k){k.done=e.target.checked?1:0;render()}};
+$('#tlist').onchange=e=>{const k=S.tasks.find(x=>x.id===e.target.dataset.d);if(k){k.done=e.target.checked?1:0;k.dt=k.done?Date.now():0;render()}};
 $('#lv').onclick=e=>{if(e.target.dataset.l){S.set.lv=e.target.dataset.l;render()}};
 [['sf','f'],['ss','s'],['sl','l']].forEach(([id,k])=>$('#'+id).onchange=e=>{S.set[k]=Math.max(1,+e.target.value||S.set[k]);render()});
 const mergeTs=(a,b)=>{const m=new Map();[...a,...b].forEach(e=>{const o=m.get(e.id);if(!o||(e.u||0)>(o.u||0))m.set(e.id,e)});return[...m.values()]};
@@ -269,7 +289,7 @@ function renderTs(){const c=S.clk;
  $('#tents').innerHTML=Object.entries(g).map(([d,a])=>`<h2 style="margin-top:14px">${d} <span class="mu">${hm(a.reduce((s,e)=>s+e.out-e.in,0))}</span></h2>`+a.map(e=>`<div class="item" data-e="${e.id}" style="cursor:pointer"><span>${tm(e.in)}–${tm(e.out)}<br><small class="mu">${esc((e.c?e.c+' · ':'')+(e.task||'No task'))}</small></span><b>${hm(e.out-e.in)}</b></div>`).join('')).join('')||'<div class="mu">No entries yet. Clock in to log your first one.</div>';
  $('#tl').innerHTML=S.tasks.filter(x=>!x.done).map(x=>`<option value="${esc(x.t)}">`).join('');
  $('#cls').innerHTML=[...new Set([...live().map(e=>e.c),...S.tasks.map(x=>x.c)].filter(Boolean))].map(x=>`<option value="${esc(x)}">`).join('')}
-function clockOut(){const c=S.clk;if(!c)return;S.ts.push({id:Date.now()+'',in:c.in,out:mn(Date.now()),task:c.task,c:c.c,u:Date.now()});S.clk=null;render()}
+function clockOut(){const c=S.clk;if(!c)return;S.ts.push({id:Date.now()+'',in:c.in,out:mn(Date.now()),task:c.task,c:c.c,u:Date.now()});S.clk=null;render();if(S.set.eod!==day())setTimeout(()=>ask('Clocked out. Create your end-of-day report?',[['Not today',()=>{S.set.eod=day();save()}],['Not now',()=>{}],['Create report',openEod,1]]),80)}
 $('#tio').onclick=()=>{if(S.clk)return clockOut();S.clk={in:mn(Date.now()),task:$('#ttask').value.trim(),c:$('#tcl').value.trim()};render()};
 $('#ttask').oninput=e=>{const k=S.tasks.find(x=>!x.done&&x.t===e.target.value);if(k&&k.c&&!$('#tcl').value)$('#tcl').value=k.c};
 $('#acs').onclick=e=>{const a=e.target.dataset.ac;if(a!=null){S.set.ac=a;render()}};
@@ -301,6 +321,40 @@ function gen(share){const f=$('#r-f').value,t=$('#r-t').value,c=$('#r-c').value,
  h+='</tbody></table>';
  save();makePdf(h,fn,share)}
 $('#r-g').onclick=()=>gen(0);$('#r-s').onclick=()=>gen(1);
+const isTodo=l=>/^\s*(-\s*\[\s?\]|\[\s?\]|[-*]?\s*(todo|to-do|action|task)\b[:\-]?)/i.test(l);
+const clean=l=>l.replace(/^\s*(-\s*\[\s?\]|\[\s?\]|[-*]?\s*(todo|to-do|action|task)\b[:\-]?|[-*•]\s)\s*/i,'').trim();
+const mkTask=(n,l)=>{const t=clean(l);if(!t)return;S.tasks.push({id:Date.now()+''+Math.floor(Math.random()*999),t,c:n.c||'',est:0,w:n.w?1:0,done:0,fn:n.id});n.tk=[...(n.tk||[]),t];n.u=Date.now()};
+let NID=null;
+function renderNotes(){const work=S.set.md==='work',N=(S.notes||[]).filter(n=>!n.del&&!!n.w===work).sort((a,b)=>b.d-a.d);$('#ncl').classList.toggle('hide',!work);
+ $('#nlist').innerHTML=N.map(n=>{const L=n.txt.split('\n'),tk=n.tk||[],sg=L.filter(l=>isTodo(l)&&!tk.includes(clean(l))).length;
+  return `<div class="note"><div class="mu">${new Date(n.d).toLocaleString([],{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})}${n.c?' · '+esc(n.c):''}${n.k?' · while clocked in':''}</div>`+L.map((l,i)=>l.trim()?`<div class="nl${isTodo(l)?' td':''}"><span dir="auto">${esc(l)}</span>${tk.includes(clean(l))?'<small class="mu">✓ task</small>':`<button data-t="${n.id}|${i}">+ Task</button>`}</div>`:'').join('')+`<div class="row">${sg?`<button data-all="${n.id}">Add ${sg} suggested</button>`:''}<button data-e="${n.id}">Edit</button><button data-d="${n.id}">Delete</button></div></div>`}).join('')||'<div class="mu">No notes yet. Jot down anything, then turn lines into tasks.</div>'}
+$('#nlist').onclick=e=>{const d=e.target.dataset,f=id=>(S.notes||[]).find(x=>x.id===id);
+ if(d.t){const[id,i]=d.t.split('|'),n=f(id);if(n){mkTask(n,n.txt.split('\n')[i]);render()}}
+ else if(d.all){const n=f(d.all);if(n){n.txt.split('\n').filter(l=>isTodo(l)&&!(n.tk||[]).includes(clean(l))).forEach(l=>mkTask(n,l));render()}}
+ else if(d.e){const n=f(d.e);if(n){NID=n.id;$('#ntx').value=n.txt;$('#ncl').value=n.c||'';$('#nclr').classList.remove('hide');$('#nsv').textContent='Update note';$('#ntx').focus()}}
+ else if(d.d)ask('Delete this note?',[['Cancel',()=>{}],['Delete',()=>{const n=f(d.d);if(n){n.del=1;n.u=Date.now()}render()},1]])};
+$('#nclr').onclick=()=>{NID=null;$('#ntx').value='';$('#nclr').classList.add('hide');$('#nsv').textContent='Save note'};
+const saveNote=()=>{const t=$('#ntx').value.trim();if(!t)return;const w=S.set.md==='work',c=$('#ncl').value.trim()||(w&&S.clk&&S.clk.c)||'';S.notes=S.notes||[];
+ if(NID){const n=S.notes.find(x=>x.id===NID);if(n){n.txt=t;n.c=c;n.u=Date.now()}}else S.notes.push({id:Date.now()+'',txt:t,c,w:w?1:0,k:S.clk?1:0,d:Date.now(),u:Date.now()});
+ $('#nclr').click();$('#ncl').value='';render()};
+$('#nsv').onclick=saveNote;$('#ntx').onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();saveNote()}};
+const dlong=ds=>new Date(ds+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+function eodText(ds,blk){const E=live().filter(e=>dstr(e.in)===ds).sort((a,b)=>a.in-b.in),tot=E.reduce((a,e)=>a+e.out-e.in,0),by={};E.forEach(e=>{const k=e.c||'No client';by[k]=(by[k]||0)+e.out-e.in});
+ const dn=S.tasks.filter(x=>x.done&&isW(x)&&x.dt&&dstr(x.dt)===ds),fs=S.log.filter(l=>l.ok&&l.w&&l.d===ds),fmn=fs.reduce((a,l)=>a+l.m,0),nt=(S.notes||[]).filter(n=>!n.del&&n.w&&dstr(n.d)===ds),op=S.tasks.filter(x=>!x.done&&isW(x)).sort((a,b)=>(b.p===day())-(a.p===day())).slice(0,3);
+ const L=['End-of-day report: '+dlong(ds)];if(S.inv&&S.inv.name)L.push(S.inv.name);
+ L.push('','Hours: '+hm(tot)+(E.length?'':' (no clock entries)'));Object.entries(by).forEach(([k,v])=>L.push('• '+k+': '+hm(v)));
+ if(E.length){L.push('','Work log');E.forEach(e=>L.push('• '+tm(e.in)+' - '+tm(e.out)+(e.c?'  '+e.c:'')+(e.task?': '+e.task:'')))}
+ if(dn.length){L.push('','Completed');dn.forEach(x=>L.push('✓ '+x.t+(x.c?' ('+x.c+')':'')))}
+ if(fs.length)L.push('','Focus sessions: '+fs.length+' ('+hm(fmn*6e4)+')');
+ if(nt.length){L.push('','Notes');nt.forEach(n=>n.txt.split('\n').filter(l=>l.trim()).forEach(l=>L.push('• '+clean(l))))}
+ if(op.length){L.push('','Next up');op.forEach(x=>L.push('• '+x.t+(x.c?' ('+x.c+')':'')))}
+ if(blk)L.push('','Blockers: '+blk);return L.join('\n')}
+const eoGen=()=>{$('#eo-t').value=eodText($('#eo-d').value,$('#eo-b').value.trim())};
+function openEod(){$('#eo-d').value=day();$('#eo-b').value='';eoGen();$('#eo-sh').classList.toggle('hide',!navigator.share);$('#eodlg').showModal()}
+$('#eo-d').onchange=eoGen;$('#eo-b').onchange=eoGen;$('#eod').onclick=openEod;$('#eodb').onclick=openEod;$('#eo-x').onclick=()=>$('#eodlg').close();
+$('#eo-c').onclick=async()=>{const v=$('#eo-t').value;try{await navigator.clipboard.writeText(v)}catch(e){$('#eo-t').select();document.execCommand('copy')}$('#eo-c').textContent='Copied';setTimeout(()=>$('#eo-c').textContent='Copy text',1500)};
+$('#eo-sh').onclick=()=>navigator.share({title:'End-of-day report',text:$('#eo-t').value}).catch(()=>{});
+$('#eo-pdf').onclick=()=>{const v=$('#eo-t').value.split('\n');makePdf('<h1>End-of-day report</h1><div class="sub">'+esc(dlong($('#eo-d').value))+'</div><pre dir="auto" style="white-space:pre-wrap;font:12px/1.7 Arial,Helvetica,sans-serif;margin:18px 0 0">'+esc(v.slice(1).join('\n'))+'</pre>','End_of_day_report_'+$('#eo-d').value+'.pdf',0)};
 const isW=x=>x.w!=null?!!x.w:!!x.c;
 $('#seg').onclick=e=>{const m=e.target.dataset.md;if(m){S.set.md=m;render()}};
 $('#cpill').onclick=()=>{S.set.md='work';render();goTo('time')};
@@ -335,12 +389,12 @@ function renderMore(){const t=S.timer,f=!!t&&t.mode==='focus';if(!f&&FM){FM=fals
  const hr={};S.log.filter(l=>!l.ok&&l.h!=null).forEach(l=>hr[l.h]=(hr[l.h]||0)+1);const th=Object.entries(hr).sort((a,b)=>b[1]-a[1])[0];
  $('#qh').textContent=th&&th[1]>=3?'Most quits happen around '+new Date(2000,0,1,+th[0]).toLocaleTimeString([],{hour:'numeric'})+'.':''}
 const lib=()=>window.html2pdf?Promise.resolve():new Promise((ok,no)=>{const e=document.createElement('script');e.src='html2pdf.bundle.min.js';e.onload=ok;e.onerror=no;document.head.append(e)});
-async function makePdf(h,name,share){const wrap=document.createElement('div'),box=document.createElement('div');wrap.style.cssText='position:fixed;left:0;top:0;z-index:-1;opacity:0;pointer-events:none';box.className='rpt';box.style.cssText='box-sizing:border-box';box.innerHTML=h;wrap.append(box);document.body.append(wrap);
- try{await lib();const blob=await html2pdf().set({margin:12,filename:name,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4'},pagebreak:{mode:['css','legacy'],avoid:'tr'}}).from(box).outputPdf('blob');
+async function makePdf(h,name,share){const sy=window.scrollY;window.scrollTo(0,0);const wrap=document.createElement('div'),box=document.createElement('div');wrap.style.cssText='position:fixed;left:0;top:0;z-index:-1;opacity:0;pointer-events:none';box.className='rpt';box.style.cssText='box-sizing:border-box';box.innerHTML=h;wrap.append(box);document.body.append(wrap);
+ try{await lib();const blob=await html2pdf().set({margin:12,filename:name,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,backgroundColor:'#fff',scrollX:0,scrollY:0},jsPDF:{unit:'mm',format:'a4'},pagebreak:{mode:['css','legacy'],avoid:'tr'}}).from(box).outputPdf('blob');
   const f=new File([blob],name,{type:'application/pdf'});
   if(share&&navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:name}).catch(()=>{});
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),6e4)}
- }catch(e){ask("Couldn't create the PDF. Try again, or use Print.",[['Print',()=>{$('#print').innerHTML=h;window.print()}],['OK',()=>{},1]])}finally{wrap.remove()}}
+ }catch(e){ask("Couldn't create the PDF. Try again, or use Print.",[['Print',()=>{$('#print').innerHTML=h;window.print()}],['OK',()=>{},1]])}finally{wrap.remove();window.scrollTo(0,sy)}}
 const wk=()=>{const a=new Set(),b=new Set(),f=day(new Date(Date.now()-6*864e5));S.log.forEach(l=>{if(l.d<f)return;if(l.ok)a.add(l.d);if(l.s)b.add(l.d)});b.forEach(d=>a.delete(d));return a.size};
 $('#tall').onclick=()=>{SHOWALL=!SHOWALL;render()};
 $('#tplus').onclick=()=>{TM=!TM;render()};
@@ -364,7 +418,7 @@ onAuthStateChanged(auth,u=>{un&&un();un=null;ref=null;
  st.textContent='Syncing as '+u.email;btn.textContent='Sign out';ref=doc(db,'users',u.uid);
  un=onSnapshot(ref,s=>{const d=s.data(),l=FF.get();
   if(!d){cloudPush();return}
-  const r=JSON.parse(d.j);if(d.u>l.u)FF.apply({...r,u:d.u});else if(d.u<l.u)FF.merge(r.ts)},e=>st.textContent='Sync error: '+e.code)});
+  const r=JSON.parse(d.j);if(d.u>l.u)FF.apply({...r,u:d.u});else if(d.u<l.u)FF.merge(r.ts,r.notes)},e=>st.textContent='Sync error: '+e.code)});
 btn.onclick=()=>auth.currentUser?signOut(auth):signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>st.textContent='Sign-in failed: '+e.code);
 }catch(e){st.textContent='Sync unavailable (offline?). The app still works locally.'}
 </script>
